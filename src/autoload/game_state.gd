@@ -3,7 +3,7 @@
 ## Pure data — scene flow lives in main.gd, persistence in SaveManager.
 extends Node
 
-const DEFAULT_FLOOR := 3 # vertical slice starts in Light Containment
+const DEFAULT_FLOOR := 1 # every run begins at the Entrance Zone
 
 var run_active: bool = false
 var run_seed: int = 0
@@ -17,6 +17,13 @@ var designation: String = "D-9341"
 ## Highest keycard clearance currently held (0-5). Drives door access AND
 ## document declassification (PLAN §8.1 — same axis by design).
 var clearance: int = 0
+
+## Character creation (PLAN §10.8): chosen at intake, immutable per run.
+var occupation: StringName = &"unassigned"
+var traits: Array = [] # Array of StringName
+
+func has_trait(trait_id: StringName) -> bool:
+	return traits.has(trait_id)
 
 ## Sandbox settings (PLAN §10.12). Serialized with saves.
 var sandbox: Dictionary = {

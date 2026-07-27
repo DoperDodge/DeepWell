@@ -64,9 +64,10 @@ func _build_shell() -> void:
 				continue
 			var base := _grid.cell_to_world(c)
 			var is_room := _grid.cell_type(c) == FacilityGrid.CellType.ROOM
-			var floor_mat := _mat(Color(0.62, 0.63, 0.6) if is_room else Color(0.5, 0.51, 0.5), 0.7, 0.05)
+			var tint := _floor_def.wall_tint
+			var floor_mat := _mat((Color(0.62, 0.63, 0.6) if is_room else Color(0.5, 0.51, 0.5)) * tint, 0.7, 0.05)
 			_box(_structure, base + Vector3(0, -0.1, 0), Vector3(cell, 0.2, cell), floor_mat)
-			var ceil_mat := _mat(Color(0.42, 0.43, 0.45), 0.9, 0.0)
+			var ceil_mat := _mat(Color(0.42, 0.43, 0.45) * tint, 0.9, 0.0)
 			_box(_structure, base + Vector3(0, WALL_H + 0.1, 0), Vector3(cell, 0.2, cell), ceil_mat)
 			# Walls: neighbor solid, or walkable but not passable (and no door
 			# — door edges get their frame from the Door node itself).
@@ -84,7 +85,7 @@ func _build_shell() -> void:
 					continue
 				var wall_center := base + Vector3(offset.x * cell * 0.5, WALL_H * 0.5, offset.y * cell * 0.5)
 				var wall_size := Vector3(WALL_T, WALL_H, cell) if offset.x != 0 else Vector3(cell, WALL_H, WALL_T)
-				var wall_color := Color(0.68, 0.69, 0.7) if is_room else Color(0.58, 0.6, 0.62)
+				var wall_color := (Color(0.68, 0.69, 0.7) if is_room else Color(0.58, 0.6, 0.62)) * tint
 				_box(_structure, wall_center, wall_size, _mat(wall_color, 0.85, 0.0))
 
 func _build_doors() -> void:
@@ -131,6 +132,18 @@ func _dress_room(room: Dictionary) -> void:
 			_dress_lab(room)
 		"checkpoint":
 			_dress_checkpoint(room)
+		"lobby":
+			_dress_lobby(room)
+		"decon":
+			_dress_decon(room)
+		"dorm":
+			_dress_dorm(room)
+		"server":
+			_dress_server(room)
+		"autopsy":
+			_dress_autopsy(room)
+		"cryo":
+			_dress_cryo(room)
 		_:
 			pass
 	# Shared dressing: containers, documents, corpses, scatter.
@@ -249,9 +262,12 @@ func _dress_spawn(room: Dictionary) -> void:
 	sign_label.modulate = Color(0.9, 0.6, 0.25)
 	add_child(sign_label)
 	sign_label.global_position = center + Vector3(0, 2.5, -1.8)
+	if _floor_def.floor_index != GameState.DEFAULT_FLOOR:
+		_name_plate(room)
+		return
 	# Personal effects locker: a guaranteed starter kit, searchable.
 	var effects := WorldContainer.new()
-	effects.configure_fixed("cont_spawn_effects", "personal effects locker", [
+	effects.configure_fixed("f%d_cont_spawn_effects" % _floor_def.floor_index, "personal effects locker", [
 		ItemInstance.new(&"flashlight").serialize(),
 		ItemInstance.new(&"battery").serialize(),
 		ItemInstance.new(&"ripped_sheet", 2).serialize(),
@@ -269,6 +285,7 @@ func _dress_spawn(room: Dictionary) -> void:
 func _dress_stairwell(room: Dictionary) -> void:
 	var rect: Rect2i = room.rect
 	var exit := StairwellExit.new()
+	exit.floor_def = _floor_def
 	add_child(exit)
 	exit.global_position = _rect_center_world(rect)
 	# Emergency lighting: green, reliable — the one place that feels safe.
@@ -342,7 +359,7 @@ func _dress_break_room(room: Dictionary) -> void:
 	_box(_structure, pos + Vector3(0, 0.75, 0), Vector3(1.8, 0.08, 0.9), _mat(Color(0.7, 0.68, 0.6), 0.8, 0.0))
 	# The vending machine: emissive, humming, full of ancient calories.
 	var vend := WorldContainer.new()
-	vend.configure("cont_%d_vend" % _container_counter, "vending machine", &"vending", 2.0)
+	vend.configure("f%d_cont_%d_vend" % [_floor_def.floor_index, _container_counter], "vending machine", &"vending", 2.0)
 	_container_counter += 1
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
@@ -397,6 +414,108 @@ func _dress_checkpoint(room: Dictionary) -> void:
 	add_child(mi)
 	mi.global_position = center + Vector3(0, 1.4, 0)
 
+func _dress_lobby(room: Dictionary) -> void:
+	var rect: Rect2i = room.rect
+	var center := _rect_center_world(rect)
+	# Reception desk, turnstiles, and the site motto nobody believed.
+	_box(_structure, center + Vector3(0, 0.6, -1.5), Vector3(3.2, 1.2, 0.9), _mat(Color(0.55, 0.5, 0.45), 0.6, 0.1))
+	for i in 3:
+		_box(_structure, center + Vector3(-2.0 + i * 2.0, 0.55, 1.5), Vector3(0.15, 1.1, 0.7), _mat(Color(0.4, 0.42, 0.46), 0.4, 0.6))
+	var motto := Label3D.new()
+	motto.text = "SITE-104\nSECURE · CONTAIN · PROTECT\nDEPTH IS SECURITY"
+	motto.font_size = 44
+	motto.modulate = Color(0.85, 0.87, 0.9)
+	add_child(motto)
+	motto.global_position = center + Vector3(0, 2.6, -rect.size.y * FacilityGrid.CELL_SIZE * 0.5 + 0.4)
+
+func _dress_decon(room: Dictionary) -> void:
+	var rect: Rect2i = room.rect
+	var center := _rect_center_world(rect)
+	for i in 4:
+		var head := MeshInstance3D.new()
+		var mesh := CylinderMesh.new()
+		mesh.top_radius = 0.06
+		mesh.bottom_radius = 0.12
+		mesh.height = 0.25
+		mesh.material = _mat(Color(0.6, 0.62, 0.66), 0.4, 0.7)
+		head.mesh = mesh
+		add_child(head)
+		head.global_position = center + Vector3(-2.1 + i * 1.4, WALL_H - 0.35, 0)
+	# The drain. There is old blood in the drain (PLAN §6.2 Floor 1 horror).
+	_box(_structure, center + Vector3(0, 0.006, 0), Vector3(0.8, 0.012, 0.8), _mat(Color(0.16, 0.1, 0.1), 0.5, 0.3))
+
+func _dress_dorm(room: Dictionary) -> void:
+	var rect: Rect2i = room.rect
+	for _i in maxi(2, (rect.size.x * rect.size.y) / 4):
+		var pos := _room_spot(rect)
+		_box(_structure, pos + Vector3(0, 0.3, 0), Vector3(2.0, 0.3, 0.9), _mat(Color(0.35, 0.37, 0.42), 0.9, 0.0))
+		if _rng.randf() < 0.4: # overturned bunk
+			_box(_structure, pos + Vector3(0.4, 0.75, 0.6), Vector3(0.9, 0.9, 0.15), _mat(Color(0.3, 0.32, 0.36), 0.9, 0.0))
+
+func _dress_server(room: Dictionary) -> void:
+	var rect: Rect2i = room.rect
+	for _i in maxi(3, (rect.size.x * rect.size.y) / 3):
+		var pos := _room_spot(rect)
+		var rack := MeshInstance3D.new()
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(0.7, 2.0, 0.9)
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.1, 0.11, 0.13)
+		mat.emission_enabled = true
+		mat.emission = Color(0.1, 0.9, 0.3) if _rng.randf() < 0.6 else Color(0.9, 0.4, 0.1)
+		mat.emission_energy_multiplier = 0.5
+		mat.metallic = 0.6
+		mat.roughness = 0.4
+		mesh.material = mat
+		rack.mesh = mesh
+		rack.position.y = 1.0
+		var body := StaticBody3D.new()
+		body.collision_layer = 1
+		var shape := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = mesh.size
+		shape.shape = box
+		shape.position.y = 1.0
+		body.add_child(shape)
+		body.add_child(rack)
+		add_child(body)
+		body.global_position = pos
+
+func _dress_autopsy(room: Dictionary) -> void:
+	var rect: Rect2i = room.rect
+	for _i in maxi(2, (rect.size.x * rect.size.y) / 6):
+		var pos := _room_spot(rect)
+		_box(_structure, pos + Vector3(0, 0.5, 0), Vector3(2.0, 0.08, 0.8), _mat(Color(0.75, 0.78, 0.8), 0.25, 0.8))
+		_box(_structure, pos + Vector3(0, 0.25, 0), Vector3(0.3, 0.5, 0.3), _mat(Color(0.4, 0.42, 0.46), 0.5, 0.5))
+		if _rng.randf() < 0.5:
+			_box(_structure, pos + Vector3(0, 0.58, 0), Vector3(1.7, 0.08, 0.6), _mat(Color(0.85, 0.85, 0.82), 0.9, 0.0)) # sheet
+
+func _dress_cryo(room: Dictionary) -> void:
+	var rect: Rect2i = room.rect
+	var center := _rect_center_world(rect)
+	for _i in maxi(2, (rect.size.x * rect.size.y) / 4):
+		var pos := _room_spot(rect)
+		var pod := MeshInstance3D.new()
+		var mesh := CapsuleMesh.new()
+		mesh.radius = 0.4
+		mesh.height = 2.2
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.6, 0.75, 0.85, 0.5)
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.emission_enabled = true
+		mat.emission = Color(0.3, 0.5, 0.7)
+		mat.emission_energy_multiplier = 0.3
+		mesh.material = mat
+		pod.mesh = mesh
+		add_child(pod)
+		pod.global_position = pos + Vector3(0, 1.1, 0)
+	var frost := Label3D.new()
+	frost.text = "CRYOGENIC STORAGE — MAINTAIN SEAL"
+	frost.font_size = 26
+	frost.modulate = Color(0.6, 0.8, 0.95)
+	add_child(frost)
+	frost.global_position = center + Vector3(0, 2.7, 0)
+
 # ---------------------------------------------------------------- helpers
 
 func _container_kind_for(style: String) -> String:
@@ -415,7 +534,7 @@ func _container_kind_for(style: String) -> String:
 
 func _container_at(pos: Vector3, kind: String, table: StringName) -> void:
 	var c := WorldContainer.new()
-	c.configure("cont_%d" % _container_counter, kind, table, 2.0 + _rng.randf() * 1.5)
+	c.configure("f%d_cont_%d" % [_floor_def.floor_index, _container_counter], kind, table, 2.0 + _rng.randf() * 1.5)
 	_container_counter += 1
 	_container_visual(c, kind)
 	add_child(c)
@@ -458,7 +577,7 @@ func _document_at(pos: Vector3) -> void:
 	_place_document(pos, doc_id)
 
 func _place_document(pos: Vector3, doc_id: StringName) -> void:
-	var pickup_id := "doc_pickup_%d" % _pickup_counter
+	var pickup_id := "f%d_doc_pickup_%d" % [_floor_def.floor_index, _pickup_counter]
 	_pickup_counter += 1
 	if FacilityState.removed_pickups.has(pickup_id):
 		return
@@ -467,14 +586,14 @@ func _place_document(pos: Vector3, doc_id: StringName) -> void:
 	p.global_position = pos + Vector3(0, 0.76, 0) # desk height reads naturally
 
 func _corpse_at(pos: Vector3, table: StringName, color: Color) -> void:
-	var c := Corpse.create_scripted("corpse_%d" % _container_counter, table, color)
+	var c := Corpse.create_scripted("f%d_corpse_%d" % [_floor_def.floor_index, _container_counter], table, color)
 	_container_counter += 1
 	add_child(c)
 	c.global_position = pos
 
 func _place_planned_pickups() -> void:
 	for entry in _plan.get("pickups", []):
-		var pickup_id := "plan_pickup_%d" % _pickup_counter
+		var pickup_id := "f%d_plan_pickup_%d" % [_floor_def.floor_index, _pickup_counter]
 		_pickup_counter += 1
 		if FacilityState.removed_pickups.has(pickup_id):
 			continue
@@ -572,7 +691,7 @@ func _build_environment() -> void:
 	# The most important setting in the game (PLAN §13.1): light shafts
 	# through doorways ARE the aesthetic.
 	env.volumetric_fog_enabled = true
-	env.volumetric_fog_density = 0.028
+	env.volumetric_fog_density = _floor_def.fog_density
 	env.volumetric_fog_albedo = Color(0.7, 0.72, 0.75)
 	env.volumetric_fog_emission_energy = 0.0
 	env.volumetric_fog_anisotropy = 0.4

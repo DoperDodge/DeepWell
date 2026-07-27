@@ -1,0 +1,97 @@
+name: Build & Release
+
+# Builds the standalone Windows .exe (and Linux binary) with Godot 4.5,
+# gates on the headless validation + gameplay smoke tests, and publishes a
+# GitHub Release. Trigger manually (workflow_dispatch) or by pushing a tag.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v0.5.0)"
+        required: true
+        default: "v0.5.0"
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: "4.5"
+  GODOT_RELEASE: "4.5-stable"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot + export templates
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot-bin
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_RELEASE }}-linux-x86_64
+
+      - name: Download Godot + export templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/godot-bin
+          curl -sSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d ~/godot-bin
+          mv ~/godot-bin/Godot_v${GODOT_RELEASE}_linux.x86_64 ~/godot-bin/godot
+          chmod +x ~/godot-bin/godot
+          curl -sSL -o /tmp/templates.tpz \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz"
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          unzip -q /tmp/templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+
+      - name: Import project
+        run: ~/godot-bin/godot --headless --path . --import || true
+
+      - name: Validate (data schemas + generation soak)
+        run: ~/godot-bin/godot --headless --path . -- --validate
+
+      - name: Smoke test (full four-floor run)
+        run: ~/godot-bin/godot --headless --path . -- --smoke
+
+      - name: Export Windows + Linux
+        run: |
+          set -euo pipefail
+          GODOT=~/godot-bin/godot ./tools/build.sh windows
+          GODOT=~/godot-bin/godot ./tools/build.sh linux
+
+      - name: Package
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          cd build/windows
+          zip -q "../DEEPWELL-${TAG}-windows-x64.zip" DEEPWELL.exe LICENSE.md ATTRIBUTION.md ASSET_LICENSES.md
+          cd ../linux
+          tar -czf "../DEEPWELL-${TAG}-linux-x64.tar.gz" deepwell.x86_64 LICENSE.md ATTRIBUTION.md ASSET_LICENSES.md
+          cd ..
+          ls -la
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: "Project DEEPWELL ${{ github.event.inputs.tag || github.ref_name }}"
+          draft: false
+          generate_release_notes: true
+          body: |
+            **Project DEEPWELL** — SCP survival horror. Four floors down; the only way out is down.
+
+            **To play (Windows):** download `DEEPWELL.exe` (or the zip, which includes the license files), run it. It is a single self-contained executable — Windows SmartScreen may warn on unsigned indie builds; choose "More info → Run anyway".
+
+            **Licensing:** the game and everything in it is CC BY-SA 3.0. SCP Foundation concepts originate from https://scpwiki.com and its authors — see the bundled `ATTRIBUTION.md` and the in-game Credits screen.
+          files: |
+            build/windows/DEEPWELL.exe
+            build/DEEPWELL-*-windows-x64.zip
+            build/DEEPWELL-*-linux-x64.tar.gz

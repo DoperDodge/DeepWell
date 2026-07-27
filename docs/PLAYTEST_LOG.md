@@ -32,3 +32,18 @@ container; human playtesting was not possible. What was verified instead:
 
 **Action for next session with a display:** 30-minute exported-build session
 answering all six questions for real, plus FPS capture at 1080p.
+
+## 2026-07-27 — v0.5 four-floor build, automated headless pass
+
+1. **Crashes:** none. `--validate` (15 seeds × 4 floors, determinism) and
+   `--smoke` (complete run: intake → four floors → ending, plus the risen
+   pestilent corpse and a 173 kill regression) pass in-editor and in the
+   exported binary.
+2. **Balance risks flagged for human play:** SCP-966's rush trigger
+   (fatigue > 65 or standing still 6 s) may need a first-encounter grace;
+   SCP-049's door-opening plus 049-2 pack pressure on Floor 4 is
+   deliberately the hardest beat in the game and needs a fairness read;
+   Pestilence stage 1 is symptomless by design — confirm players connect
+   the fever moodle to the bite before stage 3 makes it obvious.
+3. **Most boring 60 s (expected):** Floor 1 by design — it is the quiet
+   contrast floor. Confirm it reads as dread, not filler.

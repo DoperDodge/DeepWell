@@ -12,6 +12,7 @@ func _ready() -> void:
 	add_child(_ui_root)
 	EventBus.restart_requested.connect(_on_restart_requested, CONNECT_DEFERRED)
 	EventBus.menu_requested.connect(_show_menu, CONNECT_DEFERRED)
+	EventBus.descend_requested.connect(_on_descend_requested, CONNECT_DEFERRED)
 	var volume := Settings.master_volume()
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(volume, 0.001)))
 	if OS.get_cmdline_user_args().has("--validate"):
@@ -26,6 +27,27 @@ func _ready() -> void:
 
 func _on_restart_requested(keep_site: bool) -> void:
 	_start_run(GameState.run_seed, keep_site, false)
+
+## Stairwell used. Carry the player (minus position) down a floor, or roll
+## the ending on the final floor. Descending is one-way — the only way out
+## is down (PLAN §1).
+func _on_descend_requested() -> void:
+	var floor_def := load("res://data/floors/floor_%d.tres" % GameState.floor_index) as FloorDef
+	if floor_def != null and floor_def.final_floor:
+		SaveManager.delete_save()
+		get_tree().call_group(&"game_ui", "show_ending")
+		return
+	var player_data: Dictionary = {}
+	if GameState.player != null:
+		player_data = GameState.player.serialize()
+		player_data.erase("pos")
+		player_data.erase("camera")
+	var from_floor := GameState.floor_index
+	GameState.floor_index += 1
+	GameState.player = null
+	EventBus.player_moved_floor.emit(from_floor, GameState.floor_index)
+	_build_world(false, player_data)
+	SaveManager.save_run() # descending is the checkpoint (PLAN §16.2)
 
 func _show_menu() -> void:
 	_clear_world()
@@ -53,9 +75,11 @@ func _on_resume_requested() -> void:
 
 func _start_run(seed_value: int, keep_site: bool, resume: bool) -> void:
 	GameState.start_new_run(seed_value, keep_site, resume)
+	if resume:
+		GameState.floor_index = int(SaveManager.read_save().get("floor", GameState.floor_index))
 	_build_world(resume)
 
-func _build_world(resume: bool) -> void:
+func _build_world(resume: bool, carried_player_state: Dictionary = {}) -> void:
 	_clear_world()
 	_world = Node3D.new()
 	_world.name = "World"
@@ -82,6 +106,8 @@ func _build_world(resume: bool) -> void:
 
 	if resume:
 		SaveManager.apply_staged_state()
+	elif not carried_player_state.is_empty():
+		player.deserialize(carried_player_state)
 	EventBus.player_spawned.emit(player)
 	SaveManager.save_run() # a run always has a resumable save from second one
 

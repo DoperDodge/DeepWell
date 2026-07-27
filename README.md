@@ -8,12 +8,18 @@ A first-person survival-horror sim: *SCP – Containment Breach* structure ×
 under **CC BY-SA 3.0** (see [LICENSE.md](LICENSE.md) — this is a license
 requirement of SCP content, not a choice).
 
-**Current build: the Phase 3 vertical slice** — Floor 3 (Light Containment),
-procedurally assembled and fully playable: survival needs, body-part medical
-system, biomonitor moodles, redacted documents, SCP-173, SCP-1048, SCP-914,
-ironman permadeath, and a persistent site where your corpses stay where they
-fell, holding everything they carried. See [PLAN.md](PLAN.md) for the full
-design and the phase roadmap.
+**Current build (v0.5): a complete four-floor descent.** Entrance Zone →
+Administration → Light Containment → Research & Testing, each procedurally
+assembled with its own identity, ending at the deep service elevator. Full
+survival loop (needs, body-part medicine, moodles, three infection tracks),
+character creation with occupations and point-buy traits, four use-trained
+skills, redacted documents on every floor, and five anomalies: SCP-173,
+SCP-1048, SCP-914, SCP-966 (with thermal goggles), and SCP-049 with his
+049-2 converted. Ironman permadeath feeds a persistent site: your corpses
+stay where they fell holding everything they carried — and if you die
+carrying the Pestilence on the Doctor's floor, the next D-Class meets you
+standing over your own body. See [PLAN.md](PLAN.md) for the full design and
+the phase roadmap.
 
 ## Running it
 
@@ -41,6 +47,7 @@ single self-contained file.
 | Q / R | Lean left / right |
 | E | Interact (hold for searches and prying) |
 | F | Flashlight |
+| Use goggles in inventory | Thermal vision (Floor 2 tells you why) |
 | Tab or I | Inventory |
 | J | Journal (documents, anomaly log, site log) |
 | B | Blink voluntarily |
@@ -49,9 +56,10 @@ single self-contained file.
 | Esc | Pause / close screens |
 | F3 | Debug overlay |
 
-Three field notes: **blinking is real** and SCP-173 knows it; **sound is
+Field notes: **blinking is real** and SCP-173 knows it; **sound is
 simulated** through doors and corridors, and everything hostile navigates by
-it; **doors close behind you** for a reason.
+it; **doors close behind you** for a reason — though they mean nothing to a
+doctor on his rounds; and if you develop a slight fever, count the hours.
 
 ## Seeds and the persistent site
 
@@ -66,9 +74,11 @@ site that killed them.
 
 - `tools/check.sh` — headless validation: script compile, data schema
   checks, a 60-seed generation soak with determinism verification.
-- `godot --headless --path . -- --smoke` — full gameplay loop test:
-  doors, loot, documents, SCP-914, saves, and a scripted SCP-173 kill with
-  corpse persistence.
+- `godot --headless --path . -- --smoke` — plays a complete four-floor
+  run headless: intake, descent, per-floor anomaly checks, the Pestilence
+  and its cure, the ending, and the risen-corpse mechanic.
+- Releases are built by `.github/workflows/release.yml`, which gates the
+  export on both test suites before publishing the `.exe`.
 - Architecture and data formats: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md),
   [docs/DATA_SCHEMAS.md](docs/DATA_SCHEMAS.md).
 - Licensing and per-article SCP credits: [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md)

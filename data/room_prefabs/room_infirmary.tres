@@ -5,11 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = &"room_infirmary"
-display_name = "Floor Infirmary"
+display_name = "Infirmary"
 size_w = 3
 size_h = 3
 style = "lab"
 special = ""
+floors = Array[int]([2, 3])
 weight = 1.0
 max_instances = 1
 door_clearance = 1

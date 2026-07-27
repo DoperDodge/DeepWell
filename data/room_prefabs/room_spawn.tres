@@ -5,11 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = &"room_spawn"
-display_name = "Processing Block 3-C"
+display_name = "Arrival Landing"
 size_w = 3
 size_h = 3
 style = "spawn"
 special = "spawn"
+floors = Array[int]([2, 3, 4])
 weight = 1.0
 max_instances = 1
 door_clearance = 0
@@ -20,5 +21,5 @@ loot_table = &"generic"
 documents_min = 0
 documents_max = 1
 light_color = Color(0.92, 0.95, 1.0, 1.0)
-broken_light_chance = 0.15
+broken_light_chance = 0.2
 corpse_chance = 0.0

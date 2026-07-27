@@ -27,7 +27,12 @@ func _tick() -> void:
 		return
 	var light := LightProbe.sample_at(player.global_position + Vector3.UP * 1.2)
 	if light < 0.06:
-		adjust(-0.18) # darkness eats you
+		var drain := 0.18
+		if GameState.has_trait(&"nyctophobic"):
+			drain *= 2.2
+		elif GameState.has_trait(&"cat_eyes"):
+			drain *= 0.5
+		adjust(-drain) # darkness eats you
 	elif light > 0.25 and sanity < 65.0:
 		adjust(0.06)
 	# Presentation-side dread, all diegetic:
@@ -38,9 +43,16 @@ func _tick() -> void:
 		_whisper_cooldown = rng.randf_range(20.0, 45.0)
 		var offset := Vector3(rng.randf_range(-4, 4), 1.5, rng.randf_range(-4, 4))
 		AudioManager.play_3d(&"whisper", player.global_position + offset, -14.0)
+	if GameState.has_trait(&"smoker"):
+		hours_since_cigarette += 1.0 / TimeManager.GAME_HOUR_REAL_SECONDS
+		if hours_since_cigarette > 2.0:
+			adjust(-0.06) # withdrawal, shaking hands, fraying edges
 	if sanity < 30.0 and _heartbeat_cooldown <= 0.0:
 		_heartbeat_cooldown = lerpf(0.9, 2.2, sanity / 30.0)
 		AudioManager.play_ui(&"heartbeat", lerpf(-6.0, -18.0, sanity / 30.0))
+
+## Smokers fray without nicotine (PLAN §10.8). Cigarette use resets this.
+var hours_since_cigarette: float = 0.0
 
 func serialize() -> Dictionary:
 	return {"sanity": sanity}

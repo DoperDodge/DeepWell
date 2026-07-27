@@ -1,0 +1,17 @@
+{
+ "id": "doc_visitor_log",
+ "title": "Visitor Sign-In Sheet (Front Desk)",
+ "doc_type": "log",
+ "found_on_floor": 1,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "SITE-104 SURFACE ANNEX \u2014 VISITOR LOG\n\n06:02  Dr. E. Ellery \u2014 RETURNING \u2014 badge 0441\n06:15  Contractor (HVAC) \u2014 ESCORTED \u2014 badge V-102\n06:40  D-Class transfer x12 \u2014 PROCESSING \u2014 no badges issued\n07:33  Dr. A. Voss \u2014 RETURNING \u2014 badge 0378\n\nAfter 07:33 the column of neat handwriting stops. The pen is still here, uncapped, dried out. The last line reads only:\n\n03:47  "
+  },
+  {
+   "clearance": 2,
+   "text": "\u2014 nobody signed in at 03:47. Security review shows the lobby camera lost eleven minutes. The turnstile counter, however, incremented by one.",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+  }
+ ]
+}

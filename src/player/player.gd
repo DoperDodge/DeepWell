@@ -16,9 +16,13 @@ var health: HealthComponent
 var moodles: MoodleSystem
 var sanity: SanitySystem
 var inventory: Inventory
+var skills: SkillSystem
 
 var flashlight: SpotLight3D
 var flashlight_on: bool = false
+## Thermal goggles (SCP-966 counter): tunnel vision, battery, and the only
+## way to see what has been following you since Floor 2.
+var thermal_on: bool = false
 var dead: bool = false
 
 var _capsule: CapsuleShape3D
@@ -83,14 +87,30 @@ func _build_components() -> void:
 	moodles = MoodleSystem.new()
 	sanity = SanitySystem.new()
 	inventory = Inventory.new()
+	skills = SkillSystem.new()
 	inventory.capacity_kg = 16.0 # 8 + strength(4) * 2 — Class-D start weak
-	for c: Node in [movement, blink, gaze, interaction, needs, health, moodles, sanity, inventory]:
+	for c: Node in [movement, blink, gaze, interaction, needs, health, moodles, sanity, inventory, skills]:
 		add_child(c)
+	_apply_occupation_kit()
+
+## Whatever your old life left you (PLAN §10.8), smuggled through intake.
+func _apply_occupation_kit() -> void:
+	match GameState.occupation:
+		&"medic":
+			inventory.add_item(ItemInstance.new(&"bandage"))
+			inventory.add_item(ItemInstance.new(&"disinfectant"))
+		&"burglar":
+			inventory.add_item(ItemInstance.new(&"crowbar"))
+		&"electrician":
+			inventory.add_item(ItemInstance.new(&"wire_spool"))
+		&"chemist":
+			inventory.add_item(ItemInstance.new(&"disinfectant"))
 
 func _process(delta: float) -> void:
 	if dead:
 		return
 	_update_flashlight(delta)
+	_update_thermal(delta)
 	# Walked distance for the termination report.
 	var moved := global_position - _distance_accum
 	moved.y = 0.0
@@ -124,6 +144,8 @@ func get_stat(stat: StringName) -> float:
 			return clampf(inventory.total_weight() / maxf(inventory.capacity_kg, 0.01) * 100.0, 0.0, 135.0)
 		&"sanity_low":
 			return 100.0 - sanity.sanity
+		&"feverish":
+			return health.pestilence_progress()
 	return 0.0
 
 func toggle_flashlight() -> void:
@@ -142,6 +164,33 @@ func toggle_flashlight() -> void:
 		flashlight.add_to_group(&"probe_light") # light betrays you (§9.4)
 	else:
 		flashlight.remove_from_group(&"probe_light")
+
+func toggle_thermal() -> void:
+	var goggles := inventory.first_of_category(&"goggles")
+	if goggles == null:
+		EventBus.toast.emit("You have no thermal goggles.")
+		return
+	if not thermal_on and goggles.charge <= 0.0:
+		EventBus.toast.emit("The goggles' cell is flat.")
+		return
+	thermal_on = not thermal_on
+	AudioManager.play_ui(&"ui_click", -8.0, 0.8)
+	# Goggles murder your peripheral attention (PLAN §7.3: "severely
+	# restrict peripheral vision") — 173 gets easier to lose.
+	gaze.attention_cone_deg = 34.0 if thermal_on else 55.0
+	gaze.peripheral_cone_deg = 40.0 if thermal_on else 78.0
+
+func _update_thermal(delta: float) -> void:
+	if not thermal_on:
+		return
+	var goggles := inventory.first_of_category(&"goggles")
+	if goggles == null:
+		toggle_thermal()
+		return
+	goggles.charge = maxf(goggles.charge - delta / 300.0, 0.0)
+	if goggles.charge <= 0.0:
+		toggle_thermal()
+		EventBus.toast.emit("The thermal goggles die.")
 
 func _update_flashlight(delta: float) -> void:
 	if Input.is_action_just_pressed("flashlight"):
@@ -180,7 +229,8 @@ func _finalize_death(cause: String) -> void:
 	var cell := Vector2i.ZERO
 	if GameState.grid != null:
 		cell = GameState.grid.world_to_cell(global_position)
-	FacilityState.record_player_death(GameState.floor_index, cell, cause, inventory.serialize())
+	FacilityState.record_player_death(GameState.floor_index, cell, cause, inventory.serialize(),
+		health.has_pestilence() or cause.contains("Pestilence") or cause.contains("anomalous etiology"))
 	EventBus.player_died.emit(cause, GameState.floor_index, global_position)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -193,6 +243,7 @@ func serialize() -> Dictionary:
 		"health": health.serialize(),
 		"sanity": sanity.serialize(),
 		"inventory": inventory.serialize(),
+		"skills": skills.serialize(),
 		"flashlight_on": flashlight_on,
 	}
 
@@ -206,5 +257,6 @@ func deserialize(d: Dictionary) -> void:
 	health.deserialize(d.get("health", {}))
 	sanity.deserialize(d.get("sanity", {}))
 	inventory.deserialize(d.get("inventory", []))
+	skills.deserialize(d.get("skills", {}))
 	if bool(d.get("flashlight_on", false)):
 		toggle_flashlight()

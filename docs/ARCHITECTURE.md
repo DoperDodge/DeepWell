@@ -78,6 +78,17 @@ GUI, and a no-binary-assets constraint. Four consequences:
   path distance an anomaly would walk, so what you hear maps to what can
   reach you.
 
+## The descent
+
+Floors are one-way (PLAN §1: the only way out is down). The stairwell emits
+`descend_requested`; main.gd carries the serialized player (minus position)
+into a freshly generated floor, and every world-state id (doors, containers,
+pickups) is floor-prefixed so per-floor diffs coexist in one run save.
+Floor 4 is `final_floor` — its exit rolls the ending. Room definitions
+declare which floors they may appear on; each floor's `FloorDef` sets grid
+size, palette tint, fog, ambience, PA voice, anomaly roster, and exit
+clearance, which also scales the generated keycard chain and its validation.
+
 ## Persistence
 
 Three layers, deliberately distinct:

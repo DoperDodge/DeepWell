@@ -19,12 +19,14 @@ var _toast_box: VBoxContainer
 var _subtitle: Label
 var _clock: Label
 var _debug: Label
+var _floor_title: Label
 var _time: float = 0.0
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	EventBus.player_spawned.connect(func(p: Node3D) -> void: _player = p)
+	EventBus.floor_generated.connect(_on_floor_generated)
 	EventBus.toast.connect(_on_toast)
 	EventBus.subtitle.connect(func(speaker: String, text: String) -> void: _show_subtitle(speaker, text))
 	EventBus.pa_announcement.connect(func(text: String) -> void: _show_subtitle("PA SYSTEM", text))
@@ -114,6 +116,18 @@ func _build() -> void:
 	_subtitle.modulate.a = 0.0
 	add_child(_subtitle)
 
+	_floor_title = Label.new()
+	_floor_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_floor_title.add_theme_font_size_override("font_size", 34)
+	_floor_title.add_theme_color_override("font_color", Color(0.85, 0.82, 0.7))
+	_floor_title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	_floor_title.add_theme_constant_override("outline_size", 6)
+	_floor_title.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_floor_title.position += Vector2(-320, 90)
+	_floor_title.custom_minimum_size = Vector2(640, 0)
+	_floor_title.modulate.a = 0.0
+	add_child(_floor_title)
+
 	_debug = Label.new()
 	_debug.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_debug.position = Vector2(12, 12)
@@ -121,6 +135,17 @@ func _build() -> void:
 	_debug.modulate = Color(0.5, 1.0, 0.6, 0.9)
 	_debug.visible = false
 	add_child(_debug)
+
+func _on_floor_generated(floor_index: int) -> void:
+	var floor_def := load("res://data/floors/floor_%d.tres" % floor_index) as FloorDef
+	if floor_def == null:
+		return
+	_floor_title.text = "FLOOR %d\n%s" % [floor_index, floor_def.zone_name.to_upper()]
+	_floor_title.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(_floor_title, "modulate:a", 1.0, 1.2)
+	tw.tween_interval(3.5)
+	tw.tween_property(_floor_title, "modulate:a", 0.0, 1.5)
 
 func _lid() -> ColorRect:
 	var rect := ColorRect.new()
@@ -162,6 +187,7 @@ func _process(delta: float) -> void:
 	_fx_mat.set_shader_parameter("desaturate", remap(clampf(sanity, 0.0, 50.0), 50.0, 0.0, 0.0, 0.45))
 	var grain := 0.05 if Settings.film_grain() else 0.0
 	_fx_mat.set_shader_parameter("grain_strength", grain)
+	_fx_mat.set_shader_parameter("thermal", 1.0 if _player.thermal_on else 0.0)
 	_fx_mat.set_shader_parameter("vignette_strength",
 		clampf(0.3 + pain * 0.004 + (100.0 - _player.movement.stamina) * 0.002, 0.0, 0.75))
 

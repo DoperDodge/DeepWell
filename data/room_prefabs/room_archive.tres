@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_archive"
+display_name = "Records Archive"
+size_w = 4
+size_h = 4
+style = "office"
+special = ""
+floors = Array[int]([2])
+weight = 1.5
+max_instances = 1
+door_clearance = 0
+powered_down_chance = 0.0
+containers_min = 2
+containers_max = 4
+loot_table = &"office"
+documents_min = 2
+documents_max = 3
+light_color = Color(0.92, 0.95, 1.0, 1.0)
+broken_light_chance = 0.35
+corpse_chance = 0.15

@@ -5,11 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = &"room_checkpoint"
-display_name = "Security Checkpoint 3-B"
+display_name = "Security Checkpoint"
 size_w = 3
 size_h = 2
 style = "checkpoint"
 special = ""
+floors = Array[int]([1, 2, 3, 4])
 weight = 1.5
 max_instances = 2
 door_clearance = 0

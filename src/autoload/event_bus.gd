@@ -43,6 +43,7 @@ signal clearance_changed(level: int)
 
 # --- Progression / lore ---
 signal skill_xp_gained(skill_id: StringName, amount: float)
+signal skill_level_up(skill_id: StringName, new_level: int)
 signal document_read(document_id: StringName)
 signal document_collected(document_id: StringName)
 signal document_open_requested(document_id: StringName)
@@ -51,6 +52,7 @@ signal incident_logged(text: String)           # facility incident reports (914 
 
 # --- UI ---
 signal toast(text: String)                     # transient HUD line
+signal descend_requested                       # stairwell used -> next floor / ending
 signal restart_requested(keep_site: bool)      # death screen -> next D-Class
 signal menu_requested                          # back to main menu
 signal subtitle(speaker: String, text: String)

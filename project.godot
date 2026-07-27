@@ -8,7 +8,7 @@ config_version=5
 
 config/name="Project DEEPWELL"
 config/description="You are D-9341, a Class-D test subject in an SCP Foundation deep-storage site during a cascading containment failure. The only way out is down."
-config/version="0.3.0"
+config/version="0.5.0"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"

@@ -17,6 +17,17 @@ static func use(player: Node, inst: ItemInstance) -> bool:
 		"flashlight":
 			player.toggle_flashlight()
 			return false
+		"goggles":
+			player.toggle_thermal()
+			return false
+		"adrenaline":
+			player.movement.stamina = player.movement.STAMINA_MAX + 40.0
+			player.needs.adjust(&"panic", -50.0)
+			player.needs.adjust(&"fatigue", 12.0) # the crash is pre-paid
+			AudioManager.play_3d(&"pickup", player.global_position, -8.0)
+			GameState.stats.items_used += 1
+			inst.count -= 1
+			return inst.count <= 0
 		"read":
 			var doc_id := StringName(def.behavior_params.get("document_id", ""))
 			if doc_id != &"":
@@ -32,7 +43,10 @@ static func _consume(player: Node, inst: ItemInstance, def: ItemDefinition) -> b
 	needs.adjust(&"boredom", -def.boredom_relief)
 	if def.sanity_restore != 0.0:
 		player.sanity.adjust(def.sanity_restore)
-	if def.sickness_risk > 0.0 and RNG.stream(&"consume").randf() < def.sickness_risk:
+	if def.id == &"cigarettes":
+		player.sanity.hours_since_cigarette = 0.0
+	var iron_gut := GameState.has_trait(&"iron_gut") or GameState.occupation == &"chemist"
+	if def.sickness_risk > 0.0 and not iron_gut and RNG.stream(&"consume").randf() < def.sickness_risk:
 		player.health.add_sickness(35.0)
 		EventBus.toast.emit("That tasted wrong.")
 	var sound := &"drink" if def.has_category(&"drink") else &"eat"

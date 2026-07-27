@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"feverish"
+display_name = "Feverish"
+stat = &"feverish"
+thresholds = Array[float]([15.0, 40.0, 66.0, 90.0])
+labels = Array[String](["Warm", "Feverish", "Burning Up", "Failing"])
+color = Color(0.55, 0.85, 0.5, 1.0)
+hint = "A slight warmth at first. You know what he told you it was."

@@ -5,7 +5,7 @@
 class_name GameUI
 extends Control
 
-enum Screen { NONE, INVENTORY, DOCUMENT, JOURNAL, PAUSE, DEATH, DESCEND, INTAKE }
+enum Screen { NONE, INVENTORY, DOCUMENT, JOURNAL, PAUSE, DEATH, DESCEND, INTAKE, ENDING }
 
 var screen: int = Screen.NONE
 
@@ -299,6 +299,14 @@ func _open_journal() -> void:
 
 	var side := VBoxContainer.new()
 	panes.add_child(side)
+	var skills_text := "SKILLS   "
+	for skill_id: StringName in SkillSystem.SKILL_IDS:
+		skills_text += "%s %d   " % [str(skill_id).capitalize(), GameState.player.skills.level(skill_id)]
+	var skills_label := Label.new()
+	skills_label.text = skills_text
+	skills_label.add_theme_font_size_override("font_size", 12)
+	skills_label.add_theme_color_override("font_color", Color(0.65, 0.75, 0.65))
+	side.add_child(skills_label)
 	side.add_child(_pane_label("ANOMALY LOG"))
 	var anomalies: Array = GameState.stats.anomalies_witnessed
 	var anomaly_text := "Nothing confirmed yet.\nStay that way." if anomalies.is_empty() else ""
@@ -329,6 +337,12 @@ func _anomaly_note(designation: StringName) -> String:
 			return "Moves when unobserved. Blinking counts. — unverified"
 		&"SCP-1048":
 			return "Small bear. Waves. Draws. Apparently harmless. Apparently."
+		&"SCP-966":
+			return "Invisible. Thermal only. It was already here. Do not sleep."
+		&"SCP-049":
+			return "The doctor. Polite. Slow. Doors mean nothing. Do not let it touch you."
+		&"SCP-049-2":
+			return "The doctor's patients. They bite. The bite carries something."
 	return "insufficient observation"
 
 # ------------------------------------------------------------ pause
@@ -496,6 +510,59 @@ func _admin_remark(cause: String) -> String:
 	if cause.contains("septicemia"):
 		return "Post-mortem note: the infirmary was two doors away."
 	return "No notable observations. Next."
+
+## The Well (PLAN §6.6-lite): the Floor 4 service elevator ends the run.
+func show_ending() -> void:
+	GameState.end_run(&"descend")
+	var root := _open_modal(Screen.ENDING, true)
+	var box := VBoxContainer.new()
+	box.custom_minimum_size = Vector2(700, 0)
+	box.add_theme_constant_override("separation", 10)
+	root.add_child(box)
+	var hours := TimeManager.hours_survived()
+	var anomalies: Array = GameState.stats.anomalies_witnessed
+	var credits := ""
+	var f := FileAccess.open("res://data/attribution.json", FileAccess.READ)
+	if f != null:
+		var parsed: Variant = JSON.parse_string(f.get_as_text())
+		if typeof(parsed) == TYPE_ARRAY:
+			for entry: Dictionary in parsed:
+				credits += "  %s — %s\n" % [entry.get("designation", "?"), entry.get("authors", "")]
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(700, 460)
+	box.add_child(scroll)
+	scroll.add_child(_mono("\n".join([
+		"[color=#8a8a8a]SCP FOUNDATION — SIGNAL LOSS REPORT[/color]",
+		"[b]SUBJECT BEYOND MONITORING RANGE — SITE-104[/b]",
+		"",
+		"Subject %s entered the deep service elevator at %s." % [GameState.designation, TimeManager.clock_string()],
+		"The shaft below Floor 4 predates the site. It predates the Foundation.",
+		"Biometric telemetry continued for 41 seconds past the last relay,",
+		"descending at a rate the elevator is not rated for. Then: nothing.",
+		"",
+		"Time on site:       %d h %02d min" % [int(hours), int(fmod(hours, 1.0) * 60.0)],
+		"Floors survived:    1 through 4, descending",
+		"Documents recovered: %d" % GameState.stats.documents_read,
+		"Anomalies engaged:  %s" % (", ".join(anomalies) if not anomalies.is_empty() else "none confirmed"),
+		"Site fatalities:    %d" % FacilityState.site_deaths,
+		"Distance walked:    %.0f m" % GameState.stats.distance_walked_m,
+		"",
+		"[i]The Well continues below. So will this game — Floors 5 through 8",
+		"are the next phases of the plan. Seed %s remembers everything you did.[/i]" % GameState.seed_code(),
+		"",
+		"[b]CREDITS & LICENSING[/b]",
+		"[color=#8a8a8a]Content relating to the SCP Foundation is licensed CC BY-SA 3.0",
+		"and originates from scpwiki.com and its authors:[/color]",
+		credits,
+		"[color=#8a8a8a]All visual designs original. Godot Engine (MIT). This game is",
+		"released under CC BY-SA 3.0 — copy it, mod it, share it.[/color]",
+	]), 14))
+	var menu_btn := Button.new()
+	menu_btn.text = "Main menu"
+	menu_btn.pressed.connect(func() -> void:
+		_close()
+		EventBus.menu_requested.emit())
+	box.add_child(menu_btn)
 
 func show_descend() -> void:
 	GameState.end_run(&"descend")

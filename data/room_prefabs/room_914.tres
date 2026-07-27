@@ -10,6 +10,7 @@ size_w = 4
 size_h = 4
 style = "machine_room"
 special = "scp_914"
+floors = Array[int]([3])
 weight = 1.0
 max_instances = 1
 door_clearance = 1

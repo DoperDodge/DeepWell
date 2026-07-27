@@ -43,8 +43,12 @@ func _begin(target: Node) -> void:
 	if duration <= 0.0:
 		target.interact(_player)
 		return
+	# Practice makes faster hands (PLAN §10.7 Scavenging).
+	duration *= 1.0 - 0.03 * _player.skills.level(&"scavenging")
+	if GameState.occupation == &"burglar":
+		duration *= 0.6
 	_hold_target = target
-	_hold_needed = duration
+	_hold_needed = maxf(duration, 0.4)
 	_hold_time = 0.0
 	_rummage_timer = 0.0
 
@@ -64,6 +68,8 @@ func _continue_hold(delta: float) -> void:
 	if _hold_time >= _hold_needed:
 		var target := _hold_target
 		_cancel_hold()
+		if target is WorldContainer or target is Corpse:
+			_player.skills.add_xp(&"scavenging", 20.0)
 		target.interact(_player)
 
 func _cancel_hold() -> void:

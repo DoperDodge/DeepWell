@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"thermal_goggles"
+display_name = "Thermal Goggles"
+description = "Foundation IR imaging headset. Reveals what the visible spectrum politely omits. Kills your peripheral vision while worn."
+weight_kg = 0.7
+world_shape = "box"
+world_color = Color(0.25, 0.4, 0.3, 1.0)
+world_size = Vector3(0.18, 0.08, 0.12)
+categories = Array[StringName]([&"goggles", &"tool"])
+use_behavior = "goggles"
+refine_result = &"thermal_goggles"

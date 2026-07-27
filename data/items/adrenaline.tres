@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"adrenaline"
+display_name = "Adrenaline Autoinjector"
+description = "One dose. Your legs will not ask questions until later."
+weight_kg = 0.15
+max_stack = 2
+world_shape = "cylinder"
+world_color = Color(0.9, 0.55, 0.1, 1.0)
+world_size = Vector3(0.03, 0.12, 0.03)
+categories = Array[StringName]([&"medical"])
+use_behavior = "adrenaline"

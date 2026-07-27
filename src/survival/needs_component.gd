@@ -43,6 +43,8 @@ func _tick() -> void:
 		var rate: float = RATES_PER_HOUR[id] * per_second * mult
 		if id == &"hunger" or id == &"thirst":
 			rate *= exertion
+		if id == &"hunger" and GameState.has_trait(&"hearty_appetite"):
+			rate *= 1.35
 		adjust(id, rate)
 	# Panic decays on its own; stress decays only when panic is low.
 	adjust(&"panic", -0.35)

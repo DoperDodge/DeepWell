@@ -17,6 +17,8 @@ extends Resource
 ## "scp_173_chamber" | "scp_914"
 @export var special: String = ""
 @export var tags: Array[StringName] = []
+## Which floors this room may appear on (PLAN §6.2 — every floor distinct).
+@export var floors: Array[int] = [3]
 @export var weight: float = 1.0
 @export var max_instances: int = 3
 ## Clearance needed at this room's doors. 0 = unlocked.
