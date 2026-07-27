@@ -175,7 +175,23 @@ func _run() -> void:
 		var statue: Node3D = statues[0]
 		var away := (player.global_position - statue.global_position).normalized()
 		player.global_position = statue.global_position + away * 6.0
-		player.look_at(player.global_position + away, Vector3.UP)
+		# Isometric rule: what the CHARACTER faces is what observes. Face
+		# the statue and it must be held; turn away and it must be free.
+		player.facing_locked = true
+		player.set_facing(-away)
+		await _wait(0.4)
+		var held: float = player.gaze.observation_strength(statue)
+		_check(held > 0.15, "facing SCP-173 did not observe it (strength %.2f)" % held)
+		player.set_facing(away)
+		await _wait(0.4)
+		var released: float = player.gaze.observation_strength(statue)
+		_check(released <= 0.05, "back turned but SCP-173 still observed (%.2f)" % released)
+		print("smoke: gaze cone ok (held %.2f, released %.2f)" % [held, released])
+		# Observing 173 at close range legitimately triggers a Director rest
+		# beat (a scripted mercy that leashes anomalies away). Switch the
+		# Director off so this asserts SCP-173's behavior, not the pacing.
+		GameState.sandbox["director_enabled"] = false
+		Director.enabled = false
 		statue.hunting = true
 		var deadline := 12.0
 		while deadline > 0.0 and not player.dead:

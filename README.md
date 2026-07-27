@@ -3,8 +3,8 @@
 You are D-9341, a Class-D test subject in an SCP Foundation deep-storage site
 during a cascading containment failure. The only way out is down.
 
-A first-person survival-horror sim: *SCP – Containment Breach* structure ×
-*Project Zomboid* systemic depth. Built in **Godot 4.5** (Forward+), released
+An isometric survival-horror sim: *SCP – Containment Breach* structure ×
+*Project Zomboid* presentation and systemic depth. Built in **Godot 4.5** (Forward+), released
 under **CC BY-SA 3.0** (see [LICENSE.md](LICENSE.md) — this is a license
 requirement of SCP content, not a choice).
 
@@ -39,27 +39,34 @@ single self-contained file.
 
 ## Controls
 
+Isometric, played like Project Zomboid: you watch your character from
+above, move screen-relative, and **aim with the mouse — where the cursor
+points is where your character is looking.**
+
 | Input | Action |
 |---|---|
-| WASD / mouse | Move / look |
+| WASD | Move (screen-relative: W is up-screen) |
+| Mouse | Turn your character — this is your line of sight |
+| Mouse wheel | Zoom in / out |
 | Shift | Sprint (loud; drains stamina) |
 | C or Ctrl | Crouch (quiet) |
-| Q / R | Lean left / right |
-| E | Interact (hold for searches and prying) |
+| E | Interact with what you point at (hold for searches and prying) |
 | F | Flashlight |
 | Use goggles in inventory | Thermal vision (Floor 2 tells you why) |
 | Tab or I | Inventory |
 | J | Journal (documents, anomaly log, site log) |
 | B | Blink voluntarily |
-| Hold RMB | Keep your eyes open (blink pressure builds) |
-| Space | Jump |
+| Hold RMB or Space | Keep your eyes open (blink pressure builds) |
 | Esc | Pause / close screens |
 | F3 | Debug overlay |
 
-Field notes: **blinking is real** and SCP-173 knows it; **sound is
-simulated** through doors and corridors, and everything hostile navigates by
-it; **doors close behind you** for a reason — though they mean nothing to a
-doctor on his rounds; and if you develop a slight fever, count the hours.
+Field notes: **your character's facing is your vision, not the camera** —
+you can see SCP-173 on your screen while your character looks elsewhere, and
+then it moves; **light is how you hold it**, so the flashlight is a weapon
+and a beacon at once; **sound is simulated** through doors and corridors,
+and everything hostile navigates by it; **doors close behind you** for a
+reason — though they mean nothing to a doctor on his rounds; and if you
+develop a slight fever, count the hours.
 
 ## Seeds and the persistent site
 

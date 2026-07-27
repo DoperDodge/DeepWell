@@ -99,7 +99,7 @@ func _ready() -> void:
 	add_child(footer)
 	UILayout.fullscreen(footer)
 	var controls := Label.new()
-	controls.text = "WASD move · SHIFT sprint · C crouch · E interact · F flashlight · TAB inventory\nJ journal · Q/R lean · B blink now · hold RMB to keep your eyes open · F3 debug"
+	controls.text = "WASD move (screen-relative) · MOUSE aims where your character looks · WHEEL zoom\nSHIFT sprint · C crouch · E interact · F flashlight · TAB inventory · J journal\nB blink now · hold RMB or SPACE to keep your eyes open · F3 debug"
 	controls.add_theme_font_size_override("font_size", 12)
 	controls.add_theme_color_override("font_color", Color(0.45, 0.47, 0.5))
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

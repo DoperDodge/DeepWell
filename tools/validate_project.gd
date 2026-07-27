@@ -21,6 +21,7 @@ func _run() -> void:
 	_check_documents()
 	_check_audio()
 	_soak_generator(15)
+	_check_door_orientation()
 	_check_save_roundtrip()
 
 	if _failures.is_empty():
@@ -205,6 +206,40 @@ func _generate_signature(seed_value: int, floor_index: int) -> String:
 	GameState.grid = null
 	GameState.run_active = false
 	return sig
+
+## Every door must SEAL the grid edge it sits on: its local Z (the panel's
+## thin axis) has to point along that edge, and its local X (the slide/wall
+## axis) across it. v0.5.1 shipped with this inverted — every door stood
+## perpendicular to its wall, leaving the opening wide open.
+func _check_door_orientation() -> void:
+	var checked := 0
+	for floor_index in [1, 2, 3, 4]:
+		GameState.start_new_run(4242 + floor_index, false)
+		GameState.floor_index = floor_index
+		var generator := FloorGenerator.new()
+		get_tree().root.add_child(generator)
+		generator.generate(floor_index)
+		for node in generator.find_children("*", "Door", true, false):
+			var door := node as Door
+			var wa: Vector3 = generator.grid.cell_to_world(door.cell_a)
+			var wb: Vector3 = generator.grid.cell_to_world(door.cell_b)
+			var edge := (wb - wa).normalized()
+			var thin_axis := door.global_basis.z.normalized()
+			var alignment := absf(edge.dot(thin_axis))
+			_check(alignment > 0.99,
+				"door %s does not seal its edge (alignment %.3f, edge %s, thin axis %s)" % [
+					door.door_id, alignment, edge, thin_axis])
+			# And the panel must slide along the wall, not through it.
+			var slide_axis: Vector3 = door.global_basis.x.normalized()
+			_check(absf(edge.dot(slide_axis)) < 0.01,
+				"door %s slides through its own wall" % door.door_id)
+			checked += 1
+		AudioManager.stop_all_ambience()
+		generator.free()
+		GameState.grid = null
+		GameState.run_active = false
+	_check(checked > 20, "expected >20 doors across the four floors, saw %d" % checked)
+	print("door orientation checked: %d doors" % checked)
 
 func _check_save_roundtrip() -> void:
 	var inst := ItemInstance.new(&"bandage", 3)

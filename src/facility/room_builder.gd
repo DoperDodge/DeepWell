@@ -67,8 +67,9 @@ func _build_shell() -> void:
 			var tint := _floor_def.wall_tint
 			var floor_mat := _mat((Color(0.62, 0.63, 0.6) if is_room else Color(0.5, 0.51, 0.5)) * tint, 0.7, 0.05)
 			_box(_structure, base + Vector3(0, -0.1, 0), Vector3(cell, 0.2, cell), floor_mat)
-			var ceil_mat := _mat(Color(0.42, 0.43, 0.45) * tint, 0.9, 0.0)
-			_box(_structure, base + Vector3(0, WALL_H + 0.1, 0), Vector3(cell, 0.2, cell), ceil_mat)
+			# No ceiling mesh: the isometric camera looks down into the
+			# rooms (PZ hides roofs). Skipping them is also a large
+			# draw-call saving on a 34x34 floor.
 			# Walls: neighbor solid, or walkable but not passable (and no door
 			# — door edges get their frame from the Door node itself).
 			for offset in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
@@ -372,6 +373,7 @@ func _dress_break_room(room: Dictionary) -> void:
 	mesh.material = mat
 	mi.mesh = mesh
 	mi.position.y = 0.95
+	mi.add_to_group(&"cutaway_wall")
 	vend.add_child(mi)
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -469,6 +471,7 @@ func _dress_server(room: Dictionary) -> void:
 		mesh.material = mat
 		rack.mesh = mesh
 		rack.position.y = 1.0
+		rack.add_to_group(&"cutaway_wall")
 		var body := StaticBody3D.new()
 		body.collision_layer = 1
 		var shape := CollisionShape3D.new()
@@ -507,6 +510,7 @@ func _dress_cryo(room: Dictionary) -> void:
 		mat.emission_energy_multiplier = 0.3
 		mesh.material = mat
 		pod.mesh = mesh
+		pod.add_to_group(&"cutaway_wall")
 		add_child(pod)
 		pod.global_position = pos + Vector3(0, 1.1, 0)
 	var frost := Label3D.new()
@@ -562,6 +566,8 @@ func _container_visual(c: WorldContainer, kind: String) -> void:
 	mesh.material = _mat(color, 0.75, 0.2)
 	mi.mesh = mesh
 	mi.position.y = size.y * 0.5
+	if size.y >= CUTAWAY_MIN_HEIGHT:
+		mi.add_to_group(&"cutaway_wall")
 	c.add_child(mi)
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -629,8 +635,12 @@ func _name_plate(room: Dictionary) -> void:
 	label.text = def.display_name.to_upper()
 	label.font_size = 24
 	label.modulate = Color(0.75, 0.78, 0.8)
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.no_depth_test = true
+	label.fixed_size = true
+	label.pixel_size = 0.0006
 	add_child(label)
-	label.global_position = _rect_center_world(rect) + Vector3(0, 2.9, 0)
+	label.global_position = _rect_center_world(rect) + Vector3(0, 2.4, 0)
 
 func _rect_center_world(rect: Rect2i) -> Vector3:
 	var a := _grid.cell_to_world(rect.position)
@@ -645,12 +655,18 @@ func _room_spot(rect: Rect2i) -> Vector3:
 	var jitter := Vector3(_rng.randf_range(-1.1, 1.1), 0, _rng.randf_range(-1.1, 1.1))
 	return _grid.cell_to_world(cell) + jitter
 
+## Anything at least CUTAWAY_MIN_HEIGHT tall can hide the character from an
+## isometric camera, so it joins the cutaway group automatically.
+const CUTAWAY_MIN_HEIGHT := 1.5
+
 func _box(parent_body: StaticBody3D, pos: Vector3, size: Vector3, mat: StandardMaterial3D) -> void:
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	mesh.material = mat
 	mi.mesh = mesh
+	if size.y >= CUTAWAY_MIN_HEIGHT:
+		mi.add_to_group(&"cutaway_wall")
 	add_child(mi)
 	mi.global_position = pos
 	var shape := CollisionShape3D.new()

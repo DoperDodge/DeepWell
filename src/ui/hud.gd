@@ -59,15 +59,6 @@ func _build() -> void:
 	_lid_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_lid_bottom)
 
-	# Crosshair: dead center, container-guaranteed.
-	var cross_center := CenterContainer.new()
-	_full_rect(cross_center)
-	var crosshair := Label.new()
-	crosshair.text = "·"
-	crosshair.add_theme_font_size_override("font_size", 26)
-	crosshair.modulate = Color(1, 1, 1, 0.45)
-	cross_center.add_child(crosshair)
-
 	# Prompt + hold bar: centered stack, pushed below the crosshair by an
 	# asymmetric top spacer.
 	var prompt_center := CenterContainer.new()
@@ -76,7 +67,7 @@ func _build() -> void:
 	prompt_stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	prompt_stack.add_theme_constant_override("separation", 10)
 	prompt_center.add_child(prompt_stack)
-	prompt_stack.add_child(_spacer(120))
+	prompt_stack.add_child(_spacer(150))
 	_prompt = Label.new()
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_prompt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER

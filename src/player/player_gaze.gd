@@ -1,17 +1,30 @@
-## The gaze system (PLAN §9.1) — the technical core of the game.
-## Observation is a STRENGTH (0..1), not a bool: frustum, attention cone,
-## occlusion, light level, and distance all factor in. At the edge of your
-## vision, in a dark room, at 30 m, you only partially hold SCP-173 — it
-## creeps. That creeping is the entire scare.
+## The gaze system (PLAN §9.1) — the technical core of the game, in its
+## Project Zomboid form: observation comes from the CHARACTER's vision cone
+## (where you point the mouse), not from the camera frustum.
+##
+## This makes the isometric view genuinely scarier than first person: you
+## can SEE SCP-173 on your screen, standing in a corridor to your left,
+## while your character is looking the other way — and because your
+## character is not observing it, it moves. You have to physically point at
+## a thing to hold it.
+##
+## Observation is a STRENGTH (0..1): cone angle, occlusion, light level, and
+## distance all factor in. At the cone's edge, in a dark room, at 30 m, you
+## only partially hold it. It creeps. That creeping is the entire scare.
 class_name PlayerGaze
 extends Node
 
-## Full render FOV is ~80°, but human ATTENTION is narrower. Beyond it you
-## technically "see" but do not "observe".
-@export var attention_cone_deg: float = 55.0
-@export var peripheral_cone_deg: float = 78.0
-## Peripheral observation is partial — enough to slow 173, not stop it.
+## Full attention: dead ahead of the character (PZ's focused vision).
+@export var attention_cone_deg: float = 60.0
+## Peripheral: still technically seen, not properly observed.
+@export var peripheral_cone_deg: float = 110.0
 @export var peripheral_effectiveness: float = 0.35
+
+## Light response. Below BLIND you genuinely cannot see; above FULL the
+## light is no longer the limiting factor.
+const LIGHT_BLIND_BELOW := 0.012
+const LIGHT_FULL_ABOVE := 0.18
+const LIGHT_MIN_FACTOR := 0.2
 
 var _observed_now: Dictionary = {} # Node3D -> float strength
 var _observed_last: Dictionary = {}
@@ -46,48 +59,50 @@ func is_observed(target: Node3D) -> bool:
 	return observation_strength(target) > 0.05
 
 func _evaluate(target: Node3D) -> float:
-	var camera: Camera3D = _player.head.camera
 	var point := target.get_node_or_null(^"ObservationPoint") as Node3D
 	var world_pos := point.global_position if point != null else target.global_position
+	var eye: Vector3 = _player.eye_position()
 
-	# 1. Frustum test (cheap, do first)
-	if not camera.is_position_in_frustum(world_pos):
-		return 0.0
-
-	# 2. Attention cone — narrower than the render frustum
-	var to_target := world_pos - camera.global_position
+	# 1. Vision cone from the character's facing (the mouse direction).
+	var to_target := world_pos - eye
+	var flat := Vector3(to_target.x, 0.0, to_target.z)
 	var dist := to_target.length()
 	if dist < 0.01:
 		return 1.0
-	var forward := -camera.global_basis.z
-	var angle := rad_to_deg(forward.angle_to(to_target / dist))
+	if flat.length() < 0.01:
+		return 1.0 # directly overhead/underfoot
+	var facing: Vector3 = _player.facing_dir()
+	var angle := rad_to_deg(facing.angle_to(flat.normalized()))
 	var cone_factor := 0.0
 	if angle <= attention_cone_deg * 0.5:
 		cone_factor = 1.0
 	elif angle <= peripheral_cone_deg * 0.5:
 		cone_factor = peripheral_effectiveness
 	else:
-		return 0.0
+		return 0.0 # behind you. It is free to move.
 
-	# 3. Occlusion raycast against world geometry only. The target's own
+	# 2. Occlusion raycast against world geometry only. The target's own
 	# colliders are excluded — a statue must not hide behind itself.
 	var space := _player.get_world_3d().direct_space_state
 	var exclude: Array[RID] = [_player.get_rid()]
 	if target.has_method("get_occlusion_exclude_rids"):
 		exclude.append_array(target.get_occlusion_exclude_rids())
-	var q := PhysicsRayQueryParameters3D.create(camera.global_position, world_pos, 1, exclude)
+	var q := PhysicsRayQueryParameters3D.create(eye, world_pos, 1, exclude)
 	if not space.intersect_ray(q).is_empty():
 		return 0.0
 
-	# 4. Light level — you cannot observe what you cannot see. The player's
-	# own flashlight is a registered probe light, so shining it at 173
-	# genuinely holds it.
+	# 3. Light level — you cannot observe what you cannot see. In pitch
+	# blackness you hold nothing; in gloom you hold it weakly (it creeps);
+	# under a working fixture or your own flashlight beam you hold it
+	# completely. This is why the flashlight is the answer to SCP-173.
 	var light := LightProbe.sample_at(world_pos)
-	if light < 0.02:
+	if light < LIGHT_BLIND_BELOW:
 		return 0.0
-	var light_factor := clampf(remap(light, 0.02, 0.35, 0.0, 1.0), 0.0, 1.0)
+	var light_factor := clampf(
+		remap(light, LIGHT_BLIND_BELOW, LIGHT_FULL_ABOVE, LIGHT_MIN_FACTOR, 1.0),
+		LIGHT_MIN_FACTOR, 1.0)
 
-	# 5. Distance falloff — full hold inside 8 m, fading to nothing at 40 m
+	# 4. Distance falloff — full hold inside 8 m, fading to nothing at 40 m
 	var dist_factor := clampf(remap(dist, 40.0, 8.0, 0.0, 1.0), 0.0, 1.0)
 
 	return cone_factor * light_factor * dist_factor

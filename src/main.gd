@@ -15,19 +15,27 @@ func _ready() -> void:
 	EventBus.descend_requested.connect(_on_descend_requested, CONNECT_DEFERRED)
 	var volume := Settings.master_volume()
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(volume, 0.001)))
-	if OS.get_cmdline_user_args().has("--validate"):
-		var validator: Node = (load("res://tools/validate_project.gd") as GDScript).new()
-		add_child(validator)
-		return
-	if OS.get_cmdline_user_args().has("--smoke"):
-		var smoke: Node = (load("res://tools/smoke_test.gd") as GDScript).new()
-		add_child(smoke)
-		return
-	if OS.get_cmdline_user_args().has("--uiprobe"):
-		var probe: Node = (load("res://tools/ui_probe.gd") as GDScript).new()
-		add_child(probe)
-		return
+	var tools := {
+		"--validate": "res://tools/validate_project.gd",
+		"--smoke": "res://tools/smoke_test.gd",
+		"--uiprobe": "res://tools/ui_probe.gd",
+	}
+	for flag in tools:
+		if OS.get_cmdline_user_args().has(flag):
+			_run_tool(flag, tools[flag])
+			return
 	_show_menu()
+
+## Headless entry points. A tool script that fails to compile must abort the
+## process — falling through to the menu leaves a headless CI job hanging
+## with no output until its timeout.
+func _run_tool(flag: String, path: String) -> void:
+	var script: GDScript = load(path) as GDScript
+	if script == null or not script.can_instantiate():
+		printerr("FATAL: %s script failed to compile: %s" % [flag, path])
+		get_tree().quit(1)
+		return
+	add_child(script.new())
 
 func _on_restart_requested(keep_site: bool) -> void:
 	_start_run(GameState.run_seed, keep_site, false)
@@ -88,6 +96,9 @@ func _build_world(resume: bool, carried_player_state: Dictionary = {}) -> void:
 	_world = Node3D.new()
 	_world.name = "World"
 	add_child(_world)
+
+	var cutaway_script: GDScript = load("res://src/facility/wall_cutaway.gd")
+	_world.add_child(cutaway_script.new())
 
 	var generator_script: GDScript = load("res://src/facility/floor_generator.gd")
 	var generator: Node = generator_script.new()

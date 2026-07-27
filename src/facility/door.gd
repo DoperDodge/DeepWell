@@ -53,8 +53,11 @@ func _ready() -> void:
 	var wa := _grid.cell_to_world(cell_a)
 	var wb := _grid.cell_to_world(cell_b)
 	global_position = (wa + wb) * 0.5
-	if cell_a.y != cell_b.y:
-		rotation.y = PI * 0.5 # edge normal along Z -> wall runs along X
+	if cell_a.x != cell_b.x:
+		# X-adjacent cells share a wall that RUNS along world Z: rotate so
+		# local X (the wall/slide axis) lies along Z. (v0.5.1 had this
+		# inverted — every door stood perpendicular to its wall.)
+		rotation.y = PI * 0.5
 
 	# Wall segments flanking the opening + header above it.
 	var side_w := (cell - opening_w) * 0.5
@@ -76,6 +79,7 @@ func _ready() -> void:
 	shape.shape = box
 	_panel.add_child(shape)
 	_panel_mesh = MeshInstance3D.new()
+	_panel_mesh.add_to_group(&"cutaway_wall")
 	var mesh := BoxMesh.new()
 	mesh.size = box.size
 	var mat := StandardMaterial3D.new()
@@ -125,6 +129,7 @@ func _add_static_box(pos: Vector3, size: Vector3, mat: StandardMaterial3D) -> vo
 	mesh.size = size
 	mesh.material = mat
 	mi.mesh = mesh
+	mi.add_to_group(&"cutaway_wall")
 	body.add_child(mi)
 	add_child(body)
 	body.position = pos

@@ -61,3 +61,28 @@ a self-healing viewport pin for UI roots (UILayout), and a new headless
 UI-geometry probe (`--uiprobe`) asserting every element lands inside the
 viewport at two window sizes — now part of tools/check.sh and the
 release workflow gates.
+
+## 2026-07-27 — v0.5.2: doors sealed, isometric conversion
+
+Two field reports from the Windows build. First: every door stood
+perpendicular to its own wall, leaving the opening gaping — the rotation
+condition keyed on the wrong axis (Y-adjacent cells were rotated instead
+of X-adjacent). Fixed, and `--validate` now asserts, for all 67 doors
+across the four floors, that the panel's thin axis lies along the edge it
+seals and its slide axis does not pass through the wall.
+
+Second, and larger: the brief was always Project Zomboid, and the game
+had been built first-person. Converted to a fixed-yaw isometric follow
+camera with a visible character who faces the mouse, screen-relative
+movement, cursor-driven interaction, and PZ-style wall cutaway with no
+ceilings.
+
+Balance consequence worth watching in the next human session: the gaze
+light curve was rebalanced (a 0.2 floor above pitch-dark) because the old
+curve gave only a 0.09 hold in ambient-lit corridors, meaning SCP-173 was
+effectively unfreezable away from a light fixture. It should now creep in
+gloom and freeze hard under a flashlight — confirm that reads as fair.
+
+Also fixed: a headless tool script that failed to compile used to fall
+through to the main menu and hang CI until timeout; `main.gd` now aborts
+with a diagnostic instead.
