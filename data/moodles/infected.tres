@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"infected"
+display_name = "Infected"
+stat = &"infection"
+thresholds = Array[float]([25.0, 50.0, 75.0, 90.0])
+labels = Array[String](["Inflamed", "Infected", "Septic Risk", "Sepsis"])
+color = Color(0.5, 0.7, 0.3, 1.0)
+hint = "Disinfect early. After 75 it stops being local."

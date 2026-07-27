@@ -45,11 +45,14 @@ signal clearance_changed(level: int)
 signal skill_xp_gained(skill_id: StringName, amount: float)
 signal document_read(document_id: StringName)
 signal document_collected(document_id: StringName)
+signal document_open_requested(document_id: StringName)
 signal scp_witnessed(designation: StringName)  # feeds the Anomaly Log (PLAN §20.5)
 signal incident_logged(text: String)           # facility incident reports (914 uses, breaches)
 
 # --- UI ---
 signal toast(text: String)                     # transient HUD line
+signal restart_requested(keep_site: bool)      # death screen -> next D-Class
+signal menu_requested                          # back to main menu
 signal subtitle(speaker: String, text: String)
 signal ui_screen_changed(screen: StringName)
 @warning_ignore_restore("unused_signal")

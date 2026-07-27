@@ -1,0 +1,35 @@
+{
+ "id": "doc_memo_termination",
+ "title": "Memorandum: Asset Disposition (Floor 3)",
+ "doc_type": "memo",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "MEMORANDUM \u2014 SITE COMMAND\nRE: Disposition of remaining Floor 3 assets\n\nEffective immediately, all D-Class personnel active on Floor 3 at time of the 03:47 event are reclassified from PERSONNEL to "
+  },
+  {
+   "clearance": 1,
+   "text": "EXPENDED MATERIEL",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+  },
+  {
+   "clearance": 0,
+   "text": ". No recovery, ration, or medical provision will be allocated.\n\nSubjects observed reaching Floor 4 or below are to be logged for research value: survival telemetry of untrained subjects under multi-anomaly pressure is "
+  },
+  {
+   "clearance": 3,
+   "text": "the primary remaining output of this site, and the reason recontainment has not been requested",
+   "redacted_as": "[REDACTED]"
+  },
+  {
+   "clearance": 0,
+   "text": ".\n\nApproved: Site Director\nCountersigned: "
+  },
+  {
+   "clearance": 4,
+   "text": "O5-7, under GLASS COFFIN",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588"
+  }
+ ]
+}

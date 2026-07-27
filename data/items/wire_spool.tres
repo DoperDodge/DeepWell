@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wire_spool"
+display_name = "Wire Spool"
+description = "Copper wire. Electricians made things work with this; you might too, eventually."
+weight_kg = 0.4
+max_stack = 3
+world_shape = "cylinder"
+world_color = Color(0.7, 0.45, 0.2, 1.0)
+world_size = Vector3(0.08, 0.08, 0.08)
+categories = Array[StringName]([&"material"])
+upgrade_result = &"battery"

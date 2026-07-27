@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="FloorDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/floor_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+floor_index = 3
+zone_name = "Light Containment"
+grid_width = 34
+grid_height = 34
+target_rooms = 20
+extra_link_fraction = 0.22
+ambient_light = 0.05
+ambience_sound = &"drone_lcz"
+corridor_light_spacing = 3
+corridor_broken_light_chance = 0.4
+light_color = Color(0.92, 0.95, 1.0, 1.0)
+scp_spawns = Array[StringName]([&"scp_173", &"scp_1048"])
+exit_clearance = 2
+pa_lines = Array[String](["Containment status report overdue. Sectors three through seven, verify seals.", "Reminder: unaccompanied D-Class personnel outside designated areas will be processed under Directive 12.", "The cafeteria on Floor 2 is closed until further notice.", "Maintenance request 4471: corridor lighting, Sector 3. Priority: deferred.", "If you can hear this announcement, remain where you are. Personnel will not be dispatched.", "Attention: biological signature count on Floor 3 does not match roster. Recount scheduled."])

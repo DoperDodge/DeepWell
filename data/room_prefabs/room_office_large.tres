@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_office_large"
+display_name = "Administration Annex"
+size_w = 5
+size_h = 4
+style = "office"
+special = ""
+weight = 2.0
+max_instances = 2
+door_clearance = 0
+powered_down_chance = 0.0
+containers_min = 2
+containers_max = 4
+loot_table = &"office"
+documents_min = 1
+documents_max = 3
+light_color = Color(0.92, 0.95, 1.0, 1.0)
+broken_light_chance = 0.35
+corpse_chance = 0.2

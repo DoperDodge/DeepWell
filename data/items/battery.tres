@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"battery"
+display_name = "9V Battery"
+description = "Fits the flashlight. The label says LONG LIFE. The label lies."
+weight_kg = 0.15
+max_stack = 4
+world_shape = "box"
+world_color = Color(0.2, 0.25, 0.6, 1.0)
+world_size = Vector3(0.05, 0.06, 0.04)
+categories = Array[StringName]([&"battery"])
+use_behavior = "battery"
+refine_result = &"battery"

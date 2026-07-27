@@ -11,4 +11,4 @@ echo "== import =="
 "$GODOT" --headless --path . --import 2>&1 | grep -Ei "error|script" || true
 
 echo "== validate =="
-"$GODOT" --headless --path . --script tools/validate_project.gd
+"$GODOT" --headless --path . -- --validate

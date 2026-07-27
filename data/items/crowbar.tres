@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"crowbar"
+display_name = "Crowbar"
+description = "The universal keycard. Loud enough that everything on the floor hears you use it."
+weight_kg = 2.2
+world_shape = "cylinder"
+world_color = Color(0.65, 0.15, 0.12, 1.0)
+world_size = Vector3(0.07, 0.6, 0.07)
+categories = Array[StringName]([&"tool"])
+downgrade_result = &"scrap_metal"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pain"
+display_name = "Pain"
+stat = &"pain"
+thresholds = Array[float]([20.0, 45.0, 70.0, 88.0])
+labels = Array[String](["Aching", "Hurting", "Severe Pain", "Agony"])
+color = Color(0.9, 0.45, 0.3, 1.0)
+hint = "Painkillers help. Fixing the injury helps more."

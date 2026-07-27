@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_checkpoint"
+display_name = "Security Checkpoint 3-B"
+size_w = 3
+size_h = 2
+style = "checkpoint"
+special = ""
+weight = 1.5
+max_instances = 2
+door_clearance = 0
+powered_down_chance = 0.0
+containers_min = 1
+containers_max = 2
+loot_table = &"checkpoint"
+documents_min = 0
+documents_max = 1
+light_color = Color(0.92, 0.95, 1.0, 1.0)
+broken_light_chance = 0.35
+corpse_chance = 0.5

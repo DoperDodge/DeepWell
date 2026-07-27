@@ -1,0 +1,17 @@
+{
+ "id": "doc_1048_memo",
+ "title": "Memo: The Teddy Bear",
+ "doc_type": "memo",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "FROM: Site Security, Floor 3\nTO: All Floor 3 personnel\nRE: The teddy bear\n\nYes, we have all seen it. Yes, it waves. It is designated SCP-1048 and it is transferring through from Site-24 pending a containment review.\n\nDo not give it materials. Do not accept its drawings as gifts. If it hugs your leg, file a contact report \u2014 it is friendly, and that is exactly what the review is about.\n\n"
+  },
+  {
+   "clearance": 2,
+   "text": "Update: the review is overdue because Site-24 has stopped answering queries about 1048. Their last transmission on the subject was a request for their staff roster 'as of before June'. Keep filing the contact reports.",
+   "redacted_as": "[REDACTED]"
+  }
+ ]
+}

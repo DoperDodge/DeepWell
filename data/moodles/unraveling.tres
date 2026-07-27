@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"unraveling"
+display_name = "Unraveling"
+stat = &"sanity_low"
+thresholds = Array[float]([40.0, 60.0, 80.0, 92.0])
+labels = Array[String](["Rattled", "Unraveling", "Cracking", "Gone"])
+color = Color(0.75, 0.4, 0.8, 1.0)
+hint = "The dark eats you. Light, small mercies, company."

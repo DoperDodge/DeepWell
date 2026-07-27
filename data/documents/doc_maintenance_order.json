@@ -1,0 +1,12 @@
+{
+ "id": "doc_maintenance_order",
+ "title": "Work Order 4471 \u2014 Corridor Lighting",
+ "doc_type": "work_order",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "WORK ORDER 4471\nLocation: Floor 3, corridors, sectors B through E\nFault: intermittent fixture failure, 41 units\nPriority: DEFERRED (budget)\n\nTechnician note: fixtures test fine on the bench. Failures cluster and MOVE \u2014 last week sector B, this week sector D, always a connected run of them, like something walking a route with the dark. Recommend we stop deferring this.\n\nStatus: DEFERRED (budget)"
+  }
+ ]
+}

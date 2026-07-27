@@ -1,0 +1,39 @@
+{
+ "id": "doc_personnel_d9341",
+ "title": "Personnel File: D-9341",
+ "doc_type": "personnel_file",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "FOUNDATION PERSONNEL RECORD \u2014 CLASS D\n\nDesignation: D-9341\nSource: "
+  },
+  {
+   "clearance": 1,
+   "text": "state correctional intake, capital sentence commuted to Foundation custody",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+  },
+  {
+   "clearance": 0,
+   "text": "\nAssigned: Site-104, Floor 3 testing pool\nScheduled procedures: SCP-914 object testing (Mondays), "
+  },
+  {
+   "clearance": 2,
+   "text": "SCP-173 observation rotation (unscheduled, as required)",
+   "redacted_as": "[REDACTED]"
+  },
+  {
+   "clearance": 0,
+   "text": "\n\nNotes: Subject displays above-average situational awareness and below-average deference. Flagged by Dr. Voss as "
+  },
+  {
+   "clearance": 3,
+   "text": "'a survivor type \u2014 recommend against assigning to terminal-outcome tests while the observation rotation is understaffed. We need blinkers we can trust.'",
+   "redacted_as": "[REDACTED]"
+  },
+  {
+   "clearance": 0,
+   "text": "\n\nStatus: ACTIVE"
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "id": "doc_email_budget",
+ "title": "Email Chain: RE: RE: RE: Floor 3 Lighting Budget",
+ "doc_type": "email",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "FROM: Facilities <fac-104@scp.int>\nTO: Site Director\nSUBJECT: RE: RE: RE: Floor 3 lighting budget\n\nSir \u2014 third request. Forty-one fixtures on Floor 3 are past service life. My electricians will not work the containment wings after the flicker incidents, and I cannot blame them.\n\n> Denied. Divert to Floor 6 pump maintenance.\n>> Sir, with respect, if the lights fail during an observation rotation, people die.\n>>> People are the one resource this site has a budget surplus of. \u2014 Dir.\n\n"
+  },
+  {
+   "clearance": 3,
+   "text": "[Forwarded to Ethics Committee by an anonymous account four minutes after the incident of 03:47. Delivery status: recipient mailbox decommissioned.]",
+   "redacted_as": ""
+  }
+ ]
+}

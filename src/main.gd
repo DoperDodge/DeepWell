@@ -10,7 +10,22 @@ func _ready() -> void:
 	_ui_root = CanvasLayer.new()
 	_ui_root.name = "UIRoot"
 	add_child(_ui_root)
+	EventBus.restart_requested.connect(_on_restart_requested, CONNECT_DEFERRED)
+	EventBus.menu_requested.connect(_show_menu, CONNECT_DEFERRED)
+	var volume := Settings.master_volume()
+	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(volume, 0.001)))
+	if OS.get_cmdline_user_args().has("--validate"):
+		var validator: Node = (load("res://tools/validate_project.gd") as GDScript).new()
+		add_child(validator)
+		return
+	if OS.get_cmdline_user_args().has("--smoke"):
+		var smoke: Node = (load("res://tools/smoke_test.gd") as GDScript).new()
+		add_child(smoke)
+		return
 	_show_menu()
+
+func _on_restart_requested(keep_site: bool) -> void:
+	_start_run(GameState.run_seed, keep_site, false)
 
 func _show_menu() -> void:
 	_clear_world()
@@ -68,20 +83,7 @@ func _build_world(resume: bool) -> void:
 	if resume:
 		SaveManager.apply_staged_state()
 	EventBus.player_spawned.emit(player)
-	_connect_run_end()
-
-func _connect_run_end() -> void:
-	if not EventBus.run_ended.is_connected(_on_run_ended):
-		EventBus.run_ended.connect(_on_run_ended)
-
-func _on_run_ended(outcome: StringName) -> void:
-	# Death/descend screens are pushed by game_ui; when they finish they emit
-	# ui_screen_changed(&"menu") which routes here via this deferred cleanup.
-	if outcome == &"quit":
-		_show_menu.call_deferred()
-
-func return_to_menu() -> void:
-	_show_menu()
+	SaveManager.save_run() # a run always has a resumable save from second one
 
 func _clear_world() -> void:
 	AudioManager.stop_all_ambience()

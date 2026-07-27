@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"stressed"
+display_name = "Stressed"
+stat = &"stress"
+thresholds = Array[float]([35.0, 60.0, 80.0, 92.0])
+labels = Array[String](["Tense", "Stressed", "Fraying", "Breaking Down"])
+color = Color(0.8, 0.65, 0.5, 1.0)
+hint = "Lower panic threshold. Read something. Anything."

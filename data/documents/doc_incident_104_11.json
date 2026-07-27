@@ -1,0 +1,44 @@
+{
+ "id": "doc_incident_104_11",
+ "title": "Incident Report 104-11",
+ "doc_type": "incident_report",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "INCIDENT REPORT 104-11\n\nAt 03:47 on "
+  },
+  {
+   "clearance": 1,
+   "text": "the 14th",
+   "redacted_as": "\u2588\u2588/\u2588\u2588"
+  },
+  {
+   "clearance": 0,
+   "text": ", site-wide containment integrity failed following "
+  },
+  {
+   "clearance": 2,
+   "text": "a staged power interruption in Sector 4",
+   "redacted_as": "[DATA EXPUNGED]"
+  },
+  {
+   "clearance": 0,
+   "text": ". Automated systems initiated lockdown. Casualties as of this filing: "
+  },
+  {
+   "clearance": 1,
+   "text": "17 confirmed, 41 unaccounted",
+   "redacted_as": "\u2588\u2588"
+  },
+  {
+   "clearance": 0,
+   "text": ".\n\nRecovery status: MTF request DENIED pending review. Site is operating under Autonomous Containment Doctrine \u2014 all floors sealed, all personnel classed as expended assets until recontainment.\n\n"
+  },
+  {
+   "clearance": 4,
+   "text": "The interruption was not accidental. Power logs show a manual override from the Director's terminal eleven minutes before failure, and an outbound message to O5-\u2588 reading only: 'It is deeper than we reported.' Refer to standing order GLASS COFFIN.",
+   "redacted_as": ""
+  }
+ ]
+}

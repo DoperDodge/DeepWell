@@ -53,6 +53,7 @@ func save_run() -> void:
 		"floor": GameState.floor_index,
 		"designation": GameState.designation,
 		"clearance": GameState.clearance,
+		"journal": GameState.journal,
 		"sandbox": GameState.sandbox,
 		"stats": GameState.stats,
 		"time": TimeManager.serialize(),
@@ -74,6 +75,7 @@ func stage_loaded_state(data: Dictionary) -> void:
 	TimeManager.deserialize(data.get("time", {}))
 	GameState.designation = data.get("designation", GameState.designation)
 	GameState.clearance = int(data.get("clearance", 0))
+	GameState.journal = data.get("journal", {})
 	GameState.sandbox = data.get("sandbox", GameState.sandbox)
 	GameState.stats = data.get("stats", GameState.stats)
 

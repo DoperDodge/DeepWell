@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"origami_crane"
+display_name = "Origami Crane"
+description = "Folded from a page of a document you cannot find. Do not unfold it."
+weight_kg = 0.01
+world_shape = "paper"
+world_color = Color(0.9, 0.88, 0.85, 1.0)
+categories = Array[StringName]([&"anomalous"])
+boredom_relief = 4.0

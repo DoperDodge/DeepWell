@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"medical"
+rolls_min = 2
+rolls_max = 3
+empty_chance = 0.15
+entries = Array[Dictionary]([{"item": &"bandage", "weight": 2, "min": 1, "max": 2}, {"item": &"disinfectant", "weight": 1.5, "min": 1, "max": 1}, {"item": &"painkillers", "weight": 1.2, "min": 1, "max": 1}, {"item": &"sterile_dressing", "weight": 0.8, "min": 1, "max": 1}, {"item": &"splint", "weight": 0.8, "min": 1, "max": 1}, {"item": &"suture_kit", "weight": 0.6, "min": 1, "max": 1}, {"item": &"scp_500_pill", "weight": 0.08, "min": 1, "max": 1}])

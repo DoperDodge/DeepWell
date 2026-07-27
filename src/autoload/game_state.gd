@@ -9,6 +9,9 @@ var run_active: bool = false
 var run_seed: int = 0
 var floor_index: int = DEFAULT_FLOOR
 var player: Node3D = null
+## FacilityGrid of the current floor — shared spatial data (pathfinding,
+## noise propagation, door topology). Set by the floor generator.
+var grid: RefCounted = null
 var designation: String = "D-9341"
 
 ## Highest keycard clearance currently held (0-5). Drives door access AND
@@ -28,6 +31,14 @@ var sandbox: Dictionary = {
 ## Run telemetry — feeds the Foundation Termination Report (PLAN §16.3).
 var stats: Dictionary = {}
 
+## Collected documents: doc_id -> clearance held when last read. Drives the
+## "new information available" marker after finding a better keycard (§8.1).
+var journal: Dictionary = {}
+
+## True while a modal UI screen is open — gameplay input is suspended but
+## the world keeps running (searching a bag mid-corridor is a choice).
+var ui_blocking: bool = false
+
 func _ready() -> void:
 	_reset_stats()
 	EventBus.document_read.connect(func(_id: StringName) -> void: stats.documents_read += 1)
@@ -42,6 +53,8 @@ func start_new_run(seed_value: int, keep_site: bool, resume: bool = false) -> vo
 	run_active = true
 	floor_index = DEFAULT_FLOOR
 	clearance = 0
+	journal = {}
+	ui_blocking = false
 	RNG.set_master_seed(seed_value)
 	_reset_stats()
 	if not keep_site and not resume:

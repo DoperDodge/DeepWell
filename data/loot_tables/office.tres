@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"office"
+rolls_min = 1
+rolls_max = 3
+empty_chance = 0.3
+entries = Array[Dictionary]([{"item": &"cigarettes", "weight": 1.5, "min": 1, "max": 4}, {"item": &"snack_bar", "weight": 1.2, "min": 1, "max": 1}, {"item": &"battery", "weight": 1, "min": 1, "max": 1}, {"item": &"wire_spool", "weight": 0.8, "min": 1, "max": 1}, {"item": &"stale_sandwich", "weight": 0.7, "min": 1, "max": 1}, {"item": &"keycard_l1", "weight": 0.35, "min": 1, "max": 1}, {"item": &"painkillers", "weight": 0.5, "min": 1, "max": 1}])
