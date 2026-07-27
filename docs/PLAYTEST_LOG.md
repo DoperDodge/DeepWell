@@ -47,3 +47,17 @@ answering all six questions for real, plus FPS capture at 1080p.
    the fever moodle to the bite before stage 3 makes it obvious.
 3. **Most boring 60 s (expected):** Floor 1 by design — it is the quiet
    contrast floor. Confirm it reads as dread, not filler.
+
+## 2026-07-27 — v0.5.1 hotfix: main menu off-screen on Windows
+
+First real-hardware report: on Windows 11 the whole main-menu column
+rendered up-left of the viewport (title and BEGIN INTAKE invisible).
+Cause: UI built as top-level Controls under the CanvasLayer using
+"anchor preset + manual position offset" — laid out against a zero-sized
+parent on a real window, a failure headless layout never reproduced.
+Fix: container-driven layout everywhere (CenterContainer/MarginContainer,
+no manual offsets), `canvas_items` stretch with a 1600x900 design canvas,
+a self-healing viewport pin for UI roots (UILayout), and a new headless
+UI-geometry probe (`--uiprobe`) asserting every element lands inside the
+viewport at two window sizes — now part of tools/check.sh and the
+release workflow gates.

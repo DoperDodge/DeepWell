@@ -10,6 +10,7 @@ enum Screen { NONE, INVENTORY, DOCUMENT, JOURNAL, PAUSE, DEATH, DESCEND, INTAKE,
 var screen: int = Screen.NONE
 
 var _modal_root: PanelContainer = null
+var _modal_overlay: Control = null
 var _container: Node = null # open WorldContainer / Corpse
 var _machine: Node = null   # open SCP914
 var _player_list: ItemList
@@ -17,7 +18,7 @@ var _other_list: ItemList
 var _weight_label: Label
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	UILayout.fullscreen(self)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group(&"game_ui")
@@ -58,9 +59,10 @@ func _open_modal(target_screen: int, pause_world: bool) -> PanelContainer:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if pause_world:
 		get_tree().paused = true
+	var wrap := UILayout.center_overlay(self, true)
+	_modal_overlay = wrap.root
 	_modal_root = PanelContainer.new()
-	_modal_root.set_anchors_preset(Control.PRESET_CENTER)
-	add_child(_modal_root)
+	(wrap.center as Control).add_child(_modal_root)
 	AudioManager.play_ui(&"ui_click", -14.0)
 	return _modal_root
 
@@ -75,8 +77,9 @@ func _close() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _dismiss() -> void:
-	if _modal_root != null:
-		_modal_root.queue_free()
+	if _modal_overlay != null:
+		_modal_overlay.queue_free()
+		_modal_overlay = null
 		_modal_root = null
 
 func _title(parent: Control, text: String) -> void:

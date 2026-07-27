@@ -65,6 +65,9 @@ jobs:
       - name: Smoke test (full four-floor run)
         run: ~/godot-bin/godot --headless --path . -- --smoke
 
+      - name: UI geometry probe
+        run: ~/godot-bin/godot --headless --path . -- --uiprobe
+
       - name: Export Windows + Linux
         run: |
           set -euo pipefail

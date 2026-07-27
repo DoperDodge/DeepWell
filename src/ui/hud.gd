@@ -1,6 +1,8 @@
 ## In-run HUD (PLAN §15): diegetic-first, no health bar. Biomonitor moodles
 ## top-right, interact prompt center, eyelid overlay, screen-effect stack,
 ## toasts and subtitles. Reads player state; never writes it.
+## Layout is container-driven throughout — no manual position offsets
+## (see UILayout for why).
 class_name HUD
 extends Control
 
@@ -10,7 +12,6 @@ var _fx_rect: ColorRect
 var _fx_mat: ShaderMaterial
 var _lid_top: ColorRect
 var _lid_bottom: ColorRect
-var _crosshair: Label
 var _prompt: Label
 var _hold_bar: ProgressBar
 var _stamina_bar: ProgressBar
@@ -23,7 +24,7 @@ var _floor_title: Label
 var _time: float = 0.0
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	UILayout.fullscreen(self)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	EventBus.player_spawned.connect(func(p: Node3D) -> void: _player = p)
 	EventBus.floor_generated.connect(_on_floor_generated)
@@ -34,137 +35,176 @@ func _ready() -> void:
 	if GameState.player != null:
 		_player = GameState.player
 
+func _full_rect(c: Control) -> Control:
+	c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(c)
+	return c
+
 func _build() -> void:
 	# Post-processing overlay (below all readable UI).
 	_fx_rect = ColorRect.new()
-	_fx_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_fx_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fx_mat = ShaderMaterial.new()
 	_fx_mat.shader = load("res://assets/shaders/screen_fx.gdshader")
 	_fx_rect.material = _fx_mat
-	add_child(_fx_rect)
+	_full_rect(_fx_rect)
 
-	# Eyelids.
-	_lid_top = _lid()
-	_lid_bottom = _lid()
+	# Eyelids: two black rects meeting in the middle of the screen.
+	_lid_top = ColorRect.new()
+	_lid_top.color = Color.BLACK
+	_lid_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_lid_top)
+	_lid_bottom = ColorRect.new()
+	_lid_bottom.color = Color.BLACK
+	_lid_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_lid_bottom)
 
-	_crosshair = Label.new()
-	_crosshair.text = "·"
-	_crosshair.add_theme_font_size_override("font_size", 26)
-	_crosshair.modulate = Color(1, 1, 1, 0.45)
-	_crosshair.set_anchors_preset(Control.PRESET_CENTER)
-	add_child(_crosshair)
+	# Crosshair: dead center, container-guaranteed.
+	var cross_center := CenterContainer.new()
+	_full_rect(cross_center)
+	var crosshair := Label.new()
+	crosshair.text = "·"
+	crosshair.add_theme_font_size_override("font_size", 26)
+	crosshair.modulate = Color(1, 1, 1, 0.45)
+	cross_center.add_child(crosshair)
 
+	# Prompt + hold bar: centered stack, pushed below the crosshair by an
+	# asymmetric top spacer.
+	var prompt_center := CenterContainer.new()
+	_full_rect(prompt_center)
+	var prompt_stack := VBoxContainer.new()
+	prompt_stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	prompt_stack.add_theme_constant_override("separation", 10)
+	prompt_center.add_child(prompt_stack)
+	prompt_stack.add_child(_spacer(120))
 	_prompt = Label.new()
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_prompt.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_prompt.add_theme_font_size_override("font_size", 17)
 	_prompt.add_theme_color_override("font_color", Color(0.92, 0.9, 0.82))
 	_prompt.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
 	_prompt.add_theme_constant_override("outline_size", 4)
-	_prompt.set_anchors_preset(Control.PRESET_CENTER)
-	_prompt.position += Vector2(0, 50)
-	add_child(_prompt)
-
+	prompt_stack.add_child(_prompt)
 	_hold_bar = ProgressBar.new()
 	_hold_bar.custom_minimum_size = Vector2(180, 8)
 	_hold_bar.show_percentage = false
-	_hold_bar.set_anchors_preset(Control.PRESET_CENTER)
-	_hold_bar.position += Vector2(-90, 78)
+	_hold_bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_hold_bar.visible = false
-	add_child(_hold_bar)
+	prompt_stack.add_child(_hold_bar)
 
-	_stamina_bar = ProgressBar.new()
-	_stamina_bar.custom_minimum_size = Vector2(220, 5)
-	_stamina_bar.show_percentage = false
-	_stamina_bar.max_value = 100.0
-	_stamina_bar.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_stamina_bar.position += Vector2(-110, -40)
-	_stamina_bar.modulate = Color(0.8, 0.85, 0.7, 0.0)
-	add_child(_stamina_bar)
-
-	# Biomonitor (top right).
-	var bio_panel := VBoxContainer.new()
-	bio_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	bio_panel.position = Vector2(-260, 14)
-	bio_panel.custom_minimum_size = Vector2(246, 0)
-	add_child(bio_panel)
-	_clock = Label.new()
-	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_clock.add_theme_font_size_override("font_size", 13)
-	_clock.modulate = Color(0.6, 0.75, 0.65, 0.85)
-	bio_panel.add_child(_clock)
-	_moodle_box = VBoxContainer.new()
-	_moodle_box.alignment = BoxContainer.ALIGNMENT_BEGIN
-	bio_panel.add_child(_moodle_box)
-
-	_toast_box = VBoxContainer.new()
-	_toast_box.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_toast_box.position = Vector2(18, -140)
-	add_child(_toast_box)
-
-	_subtitle = Label.new()
-	_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD
-	_subtitle.custom_minimum_size = Vector2(700, 0)
-	_subtitle.add_theme_font_size_override("font_size", 16)
-	_subtitle.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	_subtitle.add_theme_constant_override("outline_size", 5)
-	_subtitle.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_subtitle.position += Vector2(-350, -90)
-	_subtitle.modulate.a = 0.0
-	add_child(_subtitle)
-
+	# Floor title: top-center band.
+	var top_stack := VBoxContainer.new()
+	top_stack.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_full_rect(top_stack)
+	top_stack.add_child(_spacer(84))
 	_floor_title = Label.new()
 	_floor_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_floor_title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_floor_title.add_theme_font_size_override("font_size", 34)
 	_floor_title.add_theme_color_override("font_color", Color(0.85, 0.82, 0.7))
 	_floor_title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 	_floor_title.add_theme_constant_override("outline_size", 6)
-	_floor_title.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_floor_title.position += Vector2(-320, 90)
-	_floor_title.custom_minimum_size = Vector2(640, 0)
 	_floor_title.modulate.a = 0.0
-	add_child(_floor_title)
+	top_stack.add_child(_floor_title)
 
+	# Bottom-center band: subtitle above the stamina sliver.
+	var bottom_stack := VBoxContainer.new()
+	bottom_stack.alignment = BoxContainer.ALIGNMENT_END
+	_full_rect(bottom_stack)
+	_subtitle = Label.new()
+	_subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD
+	_subtitle.custom_minimum_size = Vector2(700, 0)
+	_subtitle.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_subtitle.add_theme_font_size_override("font_size", 16)
+	_subtitle.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	_subtitle.add_theme_constant_override("outline_size", 5)
+	_subtitle.modulate.a = 0.0
+	bottom_stack.add_child(_subtitle)
+	bottom_stack.add_child(_spacer(14))
+	_stamina_bar = ProgressBar.new()
+	_stamina_bar.custom_minimum_size = Vector2(220, 5)
+	_stamina_bar.show_percentage = false
+	_stamina_bar.max_value = 100.0
+	_stamina_bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_stamina_bar.modulate = Color(0.8, 0.85, 0.7, 0.0)
+	bottom_stack.add_child(_stamina_bar)
+	bottom_stack.add_child(_spacer(38))
+
+	# Biomonitor: top-right margin block.
+	var bio_margin := MarginContainer.new()
+	bio_margin.add_theme_constant_override("margin_right", 16)
+	bio_margin.add_theme_constant_override("margin_top", 14)
+	_full_rect(bio_margin)
+	var bio_panel := VBoxContainer.new()
+	bio_panel.size_flags_horizontal = Control.SIZE_SHRINK_END
+	bio_panel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	bio_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bio_margin.add_child(bio_panel)
+	_clock = Label.new()
+	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_clock.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_clock.add_theme_font_size_override("font_size", 13)
+	_clock.modulate = Color(0.6, 0.75, 0.65, 0.85)
+	bio_panel.add_child(_clock)
+	_moodle_box = VBoxContainer.new()
+	_moodle_box.size_flags_horizontal = Control.SIZE_SHRINK_END
+	bio_panel.add_child(_moodle_box)
+
+	# Toasts: bottom-left margin block.
+	var toast_margin := MarginContainer.new()
+	toast_margin.add_theme_constant_override("margin_left", 18)
+	toast_margin.add_theme_constant_override("margin_bottom", 140)
+	_full_rect(toast_margin)
+	_toast_box = VBoxContainer.new()
+	_toast_box.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_toast_box.size_flags_vertical = Control.SIZE_SHRINK_END
+	_toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast_margin.add_child(_toast_box)
+
+	# Debug overlay: top-left.
+	var debug_margin := MarginContainer.new()
+	debug_margin.add_theme_constant_override("margin_left", 12)
+	debug_margin.add_theme_constant_override("margin_top", 12)
+	_full_rect(debug_margin)
 	_debug = Label.new()
-	_debug.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_debug.position = Vector2(12, 12)
+	_debug.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_debug.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_debug.add_theme_font_size_override("font_size", 12)
 	_debug.modulate = Color(0.5, 1.0, 0.6, 0.9)
 	_debug.visible = false
-	add_child(_debug)
+	debug_margin.add_child(_debug)
+
+func _spacer(h: float) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(0, h)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return c
 
 func _on_floor_generated(floor_index: int) -> void:
 	var floor_def := load("res://data/floors/floor_%d.tres" % floor_index) as FloorDef
 	if floor_def == null:
 		return
-	_floor_title.text = "FLOOR %d\n%s" % [floor_index, floor_def.zone_name.to_upper()]
+	_floor_title.text = "FLOOR %d — %s" % [floor_index, floor_def.zone_name.to_upper()]
 	_floor_title.modulate.a = 0.0
 	var tw := create_tween()
 	tw.tween_property(_floor_title, "modulate:a", 1.0, 1.2)
 	tw.tween_interval(3.5)
 	tw.tween_property(_floor_title, "modulate:a", 0.0, 1.5)
 
-func _lid() -> ColorRect:
-	var rect := ColorRect.new()
-	rect.color = Color.BLACK
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	return rect
-
 func _process(delta: float) -> void:
 	_time += delta
 	if _player == null or not is_instance_valid(_player):
 		return
 	# Eyelids follow blink closure; suppression pressure narrows the eyes.
+	var vp := get_viewport_rect().size
 	var closure: float = _player.blink.closure
 	var squint: float = _player.blink.pressure * 0.12
-	var half := size.y * 0.5
-	_lid_top.size.y = half * clampf(closure + squint, 0.0, 1.0)
-	_lid_bottom.size.y = half * clampf(closure + squint, 0.0, 1.0)
-	_lid_bottom.position.y = size.y - _lid_bottom.size.y
+	var lid := vp.y * 0.5 * clampf(closure + squint, 0.0, 1.0)
+	_lid_top.position = Vector2.ZERO
+	_lid_top.size = Vector2(vp.x, lid)
+	_lid_bottom.size = Vector2(vp.x, lid)
+	_lid_bottom.position = Vector2(0, vp.y - lid)
 
 	_prompt.text = _player.interaction.current_prompt
 	var hold: float = _player.interaction.hold_progress
@@ -198,8 +238,6 @@ func _process(delta: float) -> void:
 	_update_moodles()
 
 func _update_moodles() -> void:
-	# Rebuild cheaply once a second's worth of frames would be wasteful;
-	# only rebuild when the set changes.
 	var active: Array = _player.moodles.active()
 	var signature := ""
 	for m in active:
@@ -214,6 +252,7 @@ func _update_moodles() -> void:
 		var level: int = m.level
 		var row := Label.new()
 		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		row.size_flags_horizontal = Control.SIZE_SHRINK_END
 		row.add_theme_font_size_override("font_size", 14)
 		var pips := "".rpad(level, "▮")
 		row.text = "%s %s  %s" % [def.label_for(level), pips, def.display_name]
