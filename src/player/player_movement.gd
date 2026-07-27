@@ -1,7 +1,8 @@
-## First-person movement (PLAN §19 Phase 1, constants §23): walk / sprint /
-## crouch / lean / jump, stamina, fall damage, and the footstep noise +
-## audio cadence. Injury and encumbrance genuinely slow you — a broken leg
-## is a mobility event, not a number.
+## Movement, Project Zomboid-style: WASD is screen-relative (W is up-screen,
+## not "where the character looks"), so you can back away from something
+## while still facing it — which is exactly how you survive SCP-173.
+## Constants per PLAN §23: walk / sprint / crouch, stamina, fall damage,
+## and the footstep noise + audio cadence.
 class_name PlayerMovement
 extends Node
 
@@ -11,11 +12,9 @@ const SPEED_RUN := 4.0
 const SPEED_SPRINT := 6.0
 const STAMINA_MAX := 100.0
 const STAMINA_SPRINT_COST := 12.0
-const STAMINA_JUMP_COST := 8.0
 const STAMINA_REGEN := 6.0
 const STAMINA_REGEN_DELAY := 1.5
 const GRAVITY := 9.8
-const JUMP_VELOCITY := 3.4
 
 const LOUDNESS := {
 	"crouch": 0.08,
@@ -25,10 +24,6 @@ const LOUDNESS := {
 }
 
 var stamina: float = STAMINA_MAX
-
-func stamina_max() -> float:
-	var bonus := 30.0 if GameState.occupation == &"athlete" else 0.0
-	return STAMINA_MAX + bonus + _player.skills.level(&"fitness") * 8.0
 var crouched: bool = false
 var move_state: String = "walk" # crouch|walk|run|sprint (current gait)
 var is_moving: bool = false
@@ -46,6 +41,10 @@ func _ready() -> void:
 	_player = get_parent() as CharacterBody3D
 	_footstep_rng.seed = 20347 # cosmetic variation only — not run RNG
 
+func stamina_max() -> float:
+	var bonus := 30.0 if GameState.occupation == &"athlete" else 0.0
+	return STAMINA_MAX + bonus + _player.skills.level(&"fitness") * 8.0
+
 func _physics_process(delta: float) -> void:
 	if _player == null or _player.dead:
 		return
@@ -53,12 +52,14 @@ func _physics_process(delta: float) -> void:
 		_player.velocity.x = 0.0
 		_player.velocity.z = 0.0
 		if not _player.is_on_floor():
-			_player.velocity.y -= GRAVITY * get_physics_process_delta_time()
+			_player.velocity.y -= GRAVITY * delta
 		_player.move_and_slide()
 		return
 	_handle_crouch()
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var direction := (_player.global_basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	# Screen-relative: rotate input by the camera's fixed isometric yaw.
+	var move_basis: Basis = _player.head.move_basis()
+	var direction := (move_basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	is_moving = direction.length_squared() > 0.01 and _player.is_on_floor()
 
 	var wants_sprint := Input.is_action_pressed("sprint") and not crouched
@@ -76,7 +77,7 @@ func _physics_process(delta: float) -> void:
 		if GameState.has_trait(&"asthmatic") and _sprint_time > 3.0:
 			_wheeze_timer = 4.0
 			_sprint_time = 0.0
-		elif _sprint_time > 0.0 and move_state != "sprint":
+		elif _sprint_time > 0.0:
 			_sprint_time = 0.0
 		_player.needs.exertion = 1.4 if (move_state == "run" and is_moving) else 1.0
 		_regen_delay -= delta
@@ -89,11 +90,6 @@ func _physics_process(delta: float) -> void:
 	if not _player.is_on_floor():
 		_player.velocity.y -= GRAVITY * delta
 		_fall_peak_speed = maxf(_fall_peak_speed, -_player.velocity.y)
-	elif Input.is_action_just_pressed("jump") and stamina > STAMINA_JUMP_COST and not crouched:
-		_player.velocity.y = JUMP_VELOCITY
-		stamina -= STAMINA_JUMP_COST
-		_regen_delay = STAMINA_REGEN_DELAY
-		_emit_footstep(0.35) # takeoff scuff
 
 	if direction != Vector3.ZERO:
 		_player.velocity.x = direction.x * speed

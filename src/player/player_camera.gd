@@ -1,87 +1,78 @@
-## Mouse look, head bob, lean, FOV (PLAN Phase 1). Sits on the Head node;
-## yaw rotates the body, pitch rotates the head, lean rolls + offsets it.
+## Project Zomboid-style isometric follow camera: fixed 45° yaw, steep
+## pitch, mouse-wheel zoom, smooth follow. Replaces the first-person rig —
+## the character is watched, not inhabited. The class keeps its old name so
+## the player's `head` wiring stays intact.
 class_name PlayerCamera
 extends Node3D
 
-const EYE_HEIGHT := 1.65
-const EYE_HEIGHT_CROUCHED := 0.95
-const LEAN_ANGLE_DEG := 14.0
-const LEAN_OFFSET := 0.32
-const PITCH_LIMIT := deg_to_rad(89.0)
+const YAW := deg_to_rad(45.0)
+const PITCH := deg_to_rad(-54.0)
+const ZOOM_MIN := 8.0
+const ZOOM_MAX := 22.0
+const ZOOM_DEFAULT := 13.0
+const FOLLOW_SPEED := 7.0
 
 var camera: Camera3D
+var zoom: float = ZOOM_DEFAULT
 
 var _player: CharacterBody3D
-var _pitch: float = 0.0
-var _lean: float = 0.0 # -1 left .. 1 right
-var _bob_time: float = 0.0
+var _snapped: bool = false
 var _shake: float = 0.0
+var _shake_t: float = 0.0
 
 func _ready() -> void:
 	_player = get_parent() as CharacterBody3D
+	top_level = true # follow smoothly; never inherit the body's motion
 	camera = Camera3D.new()
-	camera.fov = Settings.fov()
-	camera.near = 0.05
-	camera.far = 120.0
+	camera.fov = 35.0
+	camera.near = 0.5
+	camera.far = 160.0
 	camera.current = true
 	add_child(camera)
-	position = Vector3(0, EYE_HEIGHT, 0)
-
-func _unhandled_input(event: InputEvent) -> void:
-	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _player.dead:
-		return
-	var motion := event as InputEventMouseMotion
-	if motion != null:
-		var sens := Settings.mouse_sensitivity()
-		_player.rotate_y(-motion.relative.x * sens)
-		_pitch = clampf(_pitch - motion.relative.y * sens, -PITCH_LIMIT, PITCH_LIMIT)
+	if _player != null:
+		global_position = _player.global_position
+	rotation = Vector3(PITCH, YAW, 0.0)
+	_apply_zoom()
 
 func _process(delta: float) -> void:
-	if _player == null or _player.dead:
+	if _player == null or not is_instance_valid(_player):
 		return
-	# Lean (Q / R): peeking is quieter than walking around the corner.
-	var lean_target := 0.0
-	if Input.is_action_pressed("lean_left"):
-		lean_target = -1.0
-	elif Input.is_action_pressed("lean_right"):
-		lean_target = 1.0
-	_lean = move_toward(_lean, lean_target, delta * 6.0)
-
-	# Head bob synced to movement.
-	var movement: PlayerMovement = _player.movement
-	var speed := Vector2(_player.velocity.x, _player.velocity.z).length()
-	var bob_amp := 0.0
-	if movement.is_moving and _player.is_on_floor():
-		_bob_time += delta * speed * 1.6
-		bob_amp = clampf(speed / PlayerMovement.SPEED_SPRINT, 0.0, 1.0) * 0.05 * Settings.head_bob()
-	var bob_y := sin(_bob_time * TAU * 0.5) * bob_amp
-
-	var eye := EYE_HEIGHT_CROUCHED if movement.crouched else EYE_HEIGHT
-	position.y = lerpf(position.y, eye + bob_y, delta * 10.0)
-	position.x = _lean * LEAN_OFFSET
-
-	rotation.z = deg_to_rad(-_lean * LEAN_ANGLE_DEG)
-	rotation.x = _pitch
-
-	# Damage/scare shake, decaying.
+	if not _snapped:
+		# The player's spawn position is assigned after _ready(), so the
+		# first frame snaps instead of easing in from the origin.
+		_snapped = true
+		global_position = _player.global_position + Vector3.UP * 1.0
+	if not GameState.ui_blocking:
+		if Input.is_action_just_pressed("zoom_in"):
+			zoom = clampf(zoom - 1.4, ZOOM_MIN, ZOOM_MAX)
+			_apply_zoom()
+		elif Input.is_action_just_pressed("zoom_out"):
+			zoom = clampf(zoom + 1.4, ZOOM_MIN, ZOOM_MAX)
+			_apply_zoom()
+	global_position = global_position.lerp(
+		_player.global_position + Vector3.UP * 1.0, minf(delta * FOLLOW_SPEED, 1.0))
 	if _shake > 0.001:
 		_shake = maxf(_shake - delta * 2.0, 0.0)
-		var rng_offset := Vector3(
-			sin(_bob_time * 91.0), cos(_bob_time * 83.0), 0.0) * _shake * 0.03
-		camera.position = rng_offset
+		_shake_t += delta * 60.0
+		camera.h_offset = sin(_shake_t * 1.7) * _shake * 0.12
+		camera.v_offset = cos(_shake_t * 1.3) * _shake * 0.12
 	else:
-		camera.position = Vector3.ZERO
+		camera.h_offset = 0.0
+		camera.v_offset = 0.0
 
-	# Sprint widens the view slightly; settings FOV is the base.
-	var target_fov := Settings.fov() + (6.0 if movement.move_state == "sprint" and movement.is_moving else 0.0)
-	camera.fov = lerpf(camera.fov, target_fov, delta * 5.0)
+func _apply_zoom() -> void:
+	camera.position = Vector3(0, 0, zoom)
+
+## Screen-relative movement basis: camera yaw only, flattened.
+func move_basis() -> Basis:
+	return Basis(Vector3.UP, YAW)
 
 func shake(strength: float) -> void:
 	_shake = maxf(_shake, strength)
 
 func serialize() -> Dictionary:
-	return {"pitch": _pitch, "yaw": _player.rotation.y}
+	return {"zoom": zoom}
 
 func deserialize(d: Dictionary) -> void:
-	_pitch = float(d.get("pitch", 0.0))
-	_player.rotation.y = float(d.get("yaw", 0.0))
+	zoom = clampf(float(d.get("zoom", ZOOM_DEFAULT)), ZOOM_MIN, ZOOM_MAX)
+	_apply_zoom()

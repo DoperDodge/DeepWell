@@ -1,10 +1,13 @@
 ## D-9341. CharacterBody3D assembled from components (PLAN §5.4) — the same
-## component scripts SCPs and NPCs reuse. Builds its own scene tree in code
-## (see docs/ARCHITECTURE.md on why nothing is authored in the editor).
+## component scripts SCPs and NPCs reuse. Played Project Zomboid-style: an
+## isometric camera watches the character, WASD moves screen-relative, and
+## the character FACES THE MOUSE — the facing cone is your vision, and your
+## vision is what holds SCP-173.
 class_name Player
 extends CharacterBody3D
 
 const FLASHLIGHT_DRAIN_PER_S := 1.0 / 420.0 # ~7 minutes per battery
+const REACH_M := 3.2
 
 var head: PlayerCamera
 var movement: PlayerMovement
@@ -25,6 +28,12 @@ var flashlight_on: bool = false
 var thermal_on: bool = false
 var dead: bool = false
 
+## When true the mouse stops steering the character — for scripted beats
+## and for headless tests that aim deliberately.
+var facing_locked: bool = false
+
+var _visual: Node3D # rotates to face the mouse; body meshes + flashlight
+var _facing: Vector3 = Vector3.FORWARD
 var _capsule: CapsuleShape3D
 var _collision: CollisionShape3D
 var _distance_accum: Vector3
@@ -36,7 +45,7 @@ func _ready() -> void:
 	_build_components()
 	health.died.connect(_on_died)
 	_distance_accum = global_position
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE # the cursor IS the aim
 
 func _build_body() -> void:
 	_capsule = CapsuleShape3D.new()
@@ -47,21 +56,43 @@ func _build_body() -> void:
 	_collision.position.y = 0.9
 	add_child(_collision)
 
-	# First-person body: a visible torso/legs column in Class-D orange.
-	# Looking down and seeing yourself matters (PLAN §13.5).
+	# The visible character: Class-D orange jumpsuit, head, and a subtle
+	# brow line so the facing reads at a glance from above.
+	_visual = Node3D.new()
+	_visual.name = "Visual"
+	add_child(_visual)
+	var suit := StandardMaterial3D.new()
+	suit.albedo_color = Color(0.75, 0.33, 0.08)
+	suit.roughness = 0.9
 	var body := MeshInstance3D.new()
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.16
-	mesh.bottom_radius = 0.2
-	mesh.height = 1.25
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.75, 0.33, 0.08) # Class-D jumpsuit
-	mat.roughness = 0.9
-	mesh.material = mat
-	body.mesh = mesh
-	body.position.y = 0.65
+	var body_mesh := CapsuleMesh.new()
+	body_mesh.radius = 0.28
+	body_mesh.height = 1.35
+	body_mesh.material = suit
+	body.mesh = body_mesh
+	body.position.y = 0.75
 	body.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	add_child(body)
+	_visual.add_child(body)
+	var skin := StandardMaterial3D.new()
+	skin.albedo_color = Color(0.82, 0.66, 0.52)
+	skin.roughness = 0.85
+	var head_mesh_instance := MeshInstance3D.new()
+	var head_mesh := SphereMesh.new()
+	head_mesh.radius = 0.14
+	head_mesh.height = 0.28
+	head_mesh.material = skin
+	head_mesh_instance.mesh = head_mesh
+	head_mesh_instance.position.y = 1.58
+	_visual.add_child(head_mesh_instance)
+	var brow := MeshInstance3D.new()
+	var brow_mesh := BoxMesh.new()
+	brow_mesh.size = Vector3(0.16, 0.05, 0.06)
+	var brow_mat := StandardMaterial3D.new()
+	brow_mat.albedo_color = Color(0.25, 0.18, 0.12)
+	brow_mesh.material = brow_mat
+	brow.mesh = brow_mesh
+	brow.position = Vector3(0, 1.62, -0.12)
+	_visual.add_child(brow)
 
 	head = PlayerCamera.new()
 	head.name = "Head"
@@ -74,8 +105,9 @@ func _build_body() -> void:
 	flashlight.light_color = Color(1.0, 0.96, 0.88)
 	flashlight.shadow_enabled = true
 	flashlight.visible = false
-	head.add_child(flashlight)
-	flashlight.position = Vector3(0.15, -0.12, 0.0)
+	_visual.add_child(flashlight) # the beam follows your facing
+	flashlight.position = Vector3(0.12, 1.25, -0.2)
+	flashlight.rotation.x = deg_to_rad(-4.0)
 
 func _build_components() -> void:
 	movement = PlayerMovement.new()
@@ -109,6 +141,7 @@ func _apply_occupation_kit() -> void:
 func _process(delta: float) -> void:
 	if dead:
 		return
+	_update_facing()
 	_update_flashlight(delta)
 	_update_thermal(delta)
 	# Walked distance for the termination report.
@@ -117,9 +150,47 @@ func _process(delta: float) -> void:
 	GameState.stats.distance_walked_m += moved.length()
 	_distance_accum = global_position
 
+## PZ rule: the character looks where the mouse points.
+func _update_facing() -> void:
+	if GameState.ui_blocking or facing_locked:
+		return
+	var cam := head.camera if head != null else null
+	if cam == null or not cam.is_inside_tree():
+		return
+	var mouse := get_viewport().get_mouse_position()
+	var origin := cam.project_ray_origin(mouse)
+	var direction := cam.project_ray_normal(mouse)
+	if absf(direction.y) < 0.001:
+		return
+	var t := (global_position.y + 1.0 - origin.y) / direction.y
+	if t <= 0.0:
+		return
+	var target := origin + direction * t
+	var to_target := target - global_position
+	to_target.y = 0.0
+	if to_target.length() < 0.35:
+		return # cursor on top of the character: keep last facing
+	set_facing(to_target.normalized())
+
+func set_facing(dir: Vector3) -> void:
+	dir.y = 0.0
+	if dir.length_squared() < 0.001:
+		return
+	_facing = dir.normalized()
+	_visual.rotation.y = atan2(_facing.x, _facing.z) + PI
+
+## The direction the character is looking — drives the gaze cone (173!),
+## the flashlight, and the fallback interaction reach.
+func facing_dir() -> Vector3:
+	return _facing
+
+func eye_position() -> Vector3:
+	return global_position + Vector3.UP * 1.55
+
 func set_capsule_height(h: float) -> void:
 	_capsule.height = h
 	_collision.position.y = h * 0.5
+	_visual.scale.y = h / 1.8
 
 ## Every player stat the moodle system can threshold on (PLAN §10.1).
 func get_stat(stat: StringName) -> float:
@@ -177,8 +248,8 @@ func toggle_thermal() -> void:
 	AudioManager.play_ui(&"ui_click", -8.0, 0.8)
 	# Goggles murder your peripheral attention (PLAN §7.3: "severely
 	# restrict peripheral vision") — 173 gets easier to lose.
-	gaze.attention_cone_deg = 34.0 if thermal_on else 55.0
-	gaze.peripheral_cone_deg = 40.0 if thermal_on else 78.0
+	gaze.attention_cone_deg = 34.0 if thermal_on else 60.0
+	gaze.peripheral_cone_deg = 44.0 if thermal_on else 110.0
 
 func _update_thermal(delta: float) -> void:
 	if not thermal_on:
@@ -193,7 +264,7 @@ func _update_thermal(delta: float) -> void:
 		EventBus.toast.emit("The thermal goggles die.")
 
 func _update_flashlight(delta: float) -> void:
-	if Input.is_action_just_pressed("flashlight"):
+	if Input.is_action_just_pressed("flashlight") and not GameState.ui_blocking:
 		toggle_flashlight()
 	if not flashlight_on:
 		return

@@ -64,12 +64,38 @@ GUI, and a no-binary-assets constraint. Four consequences:
    (logic out of scenes, content out of code) is kept: content lives in
    `data/`, logic in `src/`, and `scenes/main.tscn` is the only scene file.
 
+## Isometric presentation (v0.5.2)
+
+The game is played Project Zomboid-style, and that is a systems decision as
+much as a visual one:
+
+- `PlayerCamera` is a fixed-yaw (45°), steep-pitch (-54°) follower with
+  mouse-wheel zoom. It is `top_level` so it eases behind the character
+  rather than rigidly tracking them.
+- Movement is **screen-relative** (`head.move_basis()`), decoupled from
+  facing — you can walk backwards away from something while still watching
+  it, which is the core SCP-173 survival move.
+- **The character faces the mouse**, and that facing — not the camera — is
+  what the gaze system tests. You can see 173 on screen while your
+  character looks the other way, and it will move. This is strictly
+  scarier than the first-person version it replaced.
+- `WallCutaway` fades any tagged wall or tall prop that sits between the
+  camera and the character (distance-filtered candidates, 15 Hz pass).
+  Ceilings are never built at all — the same reason PZ hides roofs, and a
+  large draw-call saving besides.
+- Geometry taller than 1.5 m joins the `cutaway_wall` group automatically
+  in `RoomBuilder._box`, so new props are handled without extra wiring.
+
 ## Perception
 
-- `PlayerGaze` returns observation **strength** (frustum → attention cone →
-  occlusion ray excluding the target's own body → light level → distance).
-  SCP-173 freezes above 0.55 and *slows* below it — peripheral vision
-  half-holds it.
+- `PlayerGaze` returns observation **strength** (facing cone → occlusion
+  ray excluding the target's own body → light level → distance). SCP-173
+  freezes above 0.55 and *slows* below it — peripheral vision half-holds
+  it, and anything behind the character is completely free.
+- The light response is deliberately floored (`LIGHT_MIN_FACTOR`): in
+  gloom you keep a weak partial hold so 173 creeps rather than sprints,
+  and under a fixture or your own flashlight beam you hold it outright.
+  That floor is what keeps dark corridors tense instead of unfair.
 - Blinking zeroes observation for its duration. Suppression (hold RMB)
   builds pressure toward a longer forced blink. Fatigue, panic, and low
   sanity raise blink rate — the survival sim and the horror mechanic are

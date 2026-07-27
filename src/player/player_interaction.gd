@@ -1,11 +1,12 @@
-## Interaction raycast with prompts and hold-to-interact (PLAN Phase 1).
-## Anything with get_prompt()/interact() is interactable; a positive
-## interact_duration() means you stand still, vulnerable, while a progress
-## ring fills — searching a desk is a commitment.
+## Interaction, Project Zomboid-style: you point at things with the mouse.
+## The cursor picks the target; the target must still be within arm's reach
+## of the character, so you cannot loot across a room. Holding [E] runs
+## timed actions (searching, prying) — which root you in place, in the open,
+## making noise.
 class_name PlayerInteraction
 extends Node
 
-const REACH_M := 2.5
+const REACH_M := 3.2
 ## world + interactable + door + pickup layers
 const RAY_MASK := 1 | 4 | 8 | 32
 
@@ -76,17 +77,46 @@ func _cancel_hold() -> void:
 	_hold_target = null
 	hold_progress = -1.0
 
+## Cursor first (what you point at), facing ray as fallback (what you walk
+## into). Both are range-limited to the character, never the camera.
 func _find_target() -> Node:
+	var by_cursor := _target_under_cursor()
+	if by_cursor != null:
+		return by_cursor
+	return _target_ahead()
+
+func _target_under_cursor() -> Node:
 	var camera: Camera3D = _player.head.camera
-	var space := _player.get_world_3d().direct_space_state
-	var from := camera.global_position
-	var to := from - camera.global_basis.z * REACH_M
-	var q := PhysicsRayQueryParameters3D.create(from, to, RAY_MASK, [_player.get_rid()])
-	q.collide_with_areas = true
-	var hit := space.intersect_ray(q)
+	if camera == null or not camera.is_inside_tree():
+		return null
+	var mouse: Vector2 = _player.get_viewport().get_mouse_position()
+	var from := camera.project_ray_origin(mouse)
+	var to := from + camera.project_ray_normal(mouse) * 200.0
+	var hit := _raycast(from, to)
 	if hit.is_empty():
 		return null
-	var node: Node = hit.collider
+	# Reach is measured from the character, not the camera.
+	if _player.global_position.distance_to(hit.position) > REACH_M:
+		return null
+	return _interactable_from(hit.collider)
+
+func _target_ahead() -> Node:
+	var from: Vector3 = _player.eye_position()
+	var facing: Vector3 = _player.facing_dir()
+	var to := from + facing * REACH_M
+	var hit := _raycast(from, to)
+	if hit.is_empty():
+		return null
+	return _interactable_from(hit.collider)
+
+func _raycast(from: Vector3, to: Vector3) -> Dictionary:
+	var space := _player.get_world_3d().direct_space_state
+	var q := PhysicsRayQueryParameters3D.create(from, to, RAY_MASK, [_player.get_rid()])
+	q.collide_with_areas = true
+	return space.intersect_ray(q)
+
+func _interactable_from(collider: Object) -> Node:
+	var node := collider as Node
 	# Walk up the tree: colliders are often children of the scripted entity.
 	while node != null:
 		if node.has_method("get_prompt") and node.has_method("interact"):

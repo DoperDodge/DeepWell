@@ -22,9 +22,7 @@ static func set_value(key: String, value: Variant) -> void:
 	_cfg.save(PATH)
 
 # Convenience accessors with the project defaults.
-static func fov() -> float: return get_value("fov", 80.0)
-static func mouse_sensitivity() -> float: return get_value("mouse_sensitivity", 0.0022)
-static func head_bob() -> float: return get_value("head_bob", 1.0)
+static func camera_zoom() -> float: return get_value("camera_zoom", 13.0)
 static func master_volume() -> float: return get_value("master_volume", 1.0)
 static func film_grain() -> bool: return get_value("film_grain", true)
 static func show_subtitles() -> bool: return get_value("subtitles", true)

@@ -73,8 +73,7 @@ func _close() -> void:
 	get_tree().paused = false
 	_container = null
 	_machine = null
-	if GameState.run_active and GameState.player != null and not GameState.player.dead:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _dismiss() -> void:
 	if _modal_overlay != null:
@@ -363,18 +362,18 @@ func _open_pause() -> void:
 	resume.pressed.connect(_close)
 	box.add_child(resume)
 
-	box.add_child(_slider_row("Field of view", 70.0, 110.0, Settings.fov(),
-		func(v: float) -> void: Settings.set_value("fov", v)))
-	box.add_child(_slider_row("Mouse sensitivity", 0.0005, 0.006, Settings.mouse_sensitivity(),
-		func(v: float) -> void: Settings.set_value("mouse_sensitivity", v)))
+	box.add_child(_slider_row("Camera zoom", PlayerCamera.ZOOM_MIN, PlayerCamera.ZOOM_MAX,
+		GameState.player.head.zoom if GameState.player != null else PlayerCamera.ZOOM_DEFAULT,
+		func(v: float) -> void:
+			if GameState.player != null:
+				GameState.player.head.zoom = v
+				GameState.player.head._apply_zoom()))
 	box.add_child(_slider_row("Master volume", 0.0, 1.0, Settings.master_volume(),
 		func(v: float) -> void:
 			Settings.set_value("master_volume", v)
 			AudioServer.set_bus_volume_db(0, linear_to_db(maxf(v, 0.001)))))
 	box.add_child(_toggle_row("Film grain", Settings.film_grain(),
 		func(v: bool) -> void: Settings.set_value("film_grain", v)))
-	box.add_child(_toggle_row("Head bob", Settings.head_bob() > 0.0,
-		func(v: bool) -> void: Settings.set_value("head_bob", 1.0 if v else 0.0)))
 	box.add_child(_toggle_row("Subtitles", Settings.show_subtitles(),
 		func(v: bool) -> void: Settings.set_value("subtitles", v)))
 
