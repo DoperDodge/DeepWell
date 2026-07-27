@@ -1,0 +1,16 @@
+# Normalize line endings for text-based Godot files
+*.gd        text eol=lf
+*.tscn      text eol=lf
+*.tres      text eol=lf
+*.godot     text eol=lf
+*.cfg       text eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+*.gdshader  text eol=lf
+*.svg       text eol=lf
+
+# NOTE: This project intentionally ships ZERO binary assets (see docs/ARCHITECTURE.md —
+# all geometry is generated at runtime and all audio is synthesized procedurally).
+# If binary assets (*.glb, *.png, *.ogg, *.wav) are ever added, enable Git LFS first:
+#   git lfs install
+#   git lfs track "*.glb" "*.png" "*.ogg" "*.wav" "*.jpg"

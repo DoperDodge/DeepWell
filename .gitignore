@@ -1,0 +1,16 @@
+# Godot 4 cache and imported artifacts
+.godot/
+*.import
+.import/
+
+# Build output — never commit binaries
+build/
+export/
+*.exe
+*.pck
+*.zip
+
+# OS noise
+.DS_Store
+Thumbs.db
+*.tmp
