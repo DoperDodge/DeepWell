@@ -2,7 +2,11 @@ name: Build & Release
 
 # Builds the standalone Windows .exe (and Linux binary) with Godot 4.5,
 # gates on the headless validation + gameplay smoke tests, and publishes a
-# GitHub Release. Trigger manually (workflow_dispatch) or by pushing a tag.
+# GitHub Release. Two triggers:
+#  - a merge to main that changes the RELEASE file (release-by-merge: bump
+#    the version in RELEASE and merge — the tag and release are created
+#    automatically)
+#  - manual workflow_dispatch with an explicit tag
 on:
   workflow_dispatch:
     inputs:
@@ -11,8 +15,8 @@ on:
         required: true
         default: "v0.5.0"
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    paths: [RELEASE]
 
 permissions:
   contents: write
@@ -67,10 +71,19 @@ jobs:
           GODOT=~/godot-bin/godot ./tools/build.sh windows
           GODOT=~/godot-bin/godot ./tools/build.sh linux
 
+      - name: Resolve tag
+        id: tag
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.inputs.tag }}"
+          if [ -z "$TAG" ]; then TAG="v$(tr -d ' \n' < RELEASE)"; fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Releasing $TAG"
+
       - name: Package
         run: |
           set -euo pipefail
-          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          TAG="${{ steps.tag.outputs.tag }}"
           cd build/windows
           zip -q "../DEEPWELL-${TAG}-windows-x64.zip" DEEPWELL.exe LICENSE.md ATTRIBUTION.md ASSET_LICENSES.md
           cd ../linux
@@ -81,8 +94,8 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          name: "Project DEEPWELL ${{ github.event.inputs.tag || github.ref_name }}"
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "Project DEEPWELL ${{ steps.tag.outputs.tag }}"
           draft: false
           generate_release_notes: true
           body: |
