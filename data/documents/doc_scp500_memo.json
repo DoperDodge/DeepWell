@@ -1,0 +1,22 @@
+{
+ "id": "doc_scp500_memo",
+ "title": "Pharmacy Memo: The Red Pills",
+ "doc_type": "memo",
+ "found_on_floor": 4,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "PHARMACY CONTROL \u2014 SCP-500\n\nRemaining inventory: TWO (2) units, down from forty-seven.\n\nPer O5 directive, remaining units are reserved for Clearance 4 personnel exhibiting confirmed Pestilence symptoms. The pharmacy safe combination is held by the floor supervisor.\n\n"
+  },
+  {
+   "clearance": 1,
+   "text": "(The pharmacy safe is open. The pharmacy safe has been open since the 14th. Whoever took the forty-five did not take the last two. Perhaps they were interrupted. Perhaps they left them for someone.)",
+   "redacted_as": ""
+  },
+  {
+   "clearance": 3,
+   "text": " Audit note: the forty-five missing units were signed out in a single transaction by the Site Director, eleven minutes before the power interruption. The Director does not have Pestilence symptoms. The Director has an elevator key.",
+   "redacted_as": "[AUDIT SEALED]"
+  }
+ ]
+}

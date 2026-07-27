@@ -1,0 +1,26 @@
+{
+ "id": "doc_966_memo",
+ "title": "Memo: Insomnia Cluster, Floor 2",
+ "doc_type": "memo",
+ "found_on_floor": 2,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "FROM: Site Physician\nTO: Site Director\nRE: Insomnia cluster, Floor 2\n\nFourteen staff on Floor 2 now report total sleep loss exceeding four days. Stimulant requests have tripled. Two researchers fell asleep mid-sentence and could not be woken for an hour, and both woke screaming about "
+  },
+  {
+   "clearance": 1,
+   "text": "'thin people standing over the beds'",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+  },
+  {
+   "clearance": 0,
+   "text": ".\n\nI am aware of the standing explanation (stress, shift work). I no longer believe it. I requisitioned a thermal imaging unit from Security and walked the dormitory wing last night with it switched on.\n\n"
+  },
+  {
+   "clearance": 2,
+   "text": "I am not filing what I saw as an addendum. I am filing it as a containment breach report. There are at least two of them, and they were already in the room when I opened the door.",
+   "redacted_as": "[REMAINDER REDACTED PENDING REVIEW]"
+  }
+ ]
+}

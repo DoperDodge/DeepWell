@@ -1,8 +1,9 @@
-## The way down. Behind the exit blast door; interacting ends the floor.
-## In the vertical slice, descending concludes the run with a Foundation
-## incident report (deeper floors are later phases — PLAN §19).
+## The way down. Behind the exit blast door; interacting advances the run to
+## the next floor — or, on the final floor, into the ending (PLAN §6.6-lite).
 class_name StairwellExit
 extends StaticBody3D
+
+var floor_def: FloorDef = null
 
 func _ready() -> void:
 	collision_layer = 4
@@ -25,15 +26,20 @@ func _ready() -> void:
 		step.position = Vector3(0, -0.15 - i * 0.28, i * 0.6 - 1.2)
 		add_child(step)
 	var sign_label := Label3D.new()
-	sign_label.text = "STAIRWELL S-3\nHEAVY CONTAINMENT ACCESS\n▼ FLOOR 4 ▼"
+	var floor_index := GameState.floor_index
+	if floor_def != null and floor_def.final_floor:
+		sign_label.text = "DEEP SERVICE ELEVATOR\nTHE WELL — AUTHORIZED DESCENT ONLY\n▼ ▼ ▼"
+	else:
+		sign_label.text = "STAIRWELL S-%d\n▼ FLOOR %d ▼" % [floor_index, floor_index + 1]
 	sign_label.font_size = 36
 	sign_label.modulate = Color(0.9, 0.85, 0.6)
 	sign_label.position = Vector3(0, 2.4, -1.4)
 	add_child(sign_label)
 
 func get_prompt(_player: Node) -> String:
-	return "[E] Descend to Floor 4"
+	if floor_def != null and floor_def.exit_label != "":
+		return "[E] " + floor_def.exit_label
+	return "[E] Descend"
 
 func interact(_player: Node) -> void:
-	SaveManager.delete_save() # the floor is done either way
-	get_tree().call_group(&"game_ui", "show_descend")
+	EventBus.descend_requested.emit()

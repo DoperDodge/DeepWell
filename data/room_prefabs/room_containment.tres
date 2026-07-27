@@ -10,6 +10,7 @@ size_w = 4
 size_h = 4
 style = "containment_cell"
 special = ""
+floors = Array[int]([3])
 weight = 2.0
 max_instances = 3
 door_clearance = 0

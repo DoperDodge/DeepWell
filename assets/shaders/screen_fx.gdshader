@@ -9,6 +9,7 @@ uniform float grain_strength : hint_range(0.0, 0.3) = 0.06;
 uniform float aberration : hint_range(0.0, 8.0) = 0.0; // rises as sanity falls
 uniform float desaturate : hint_range(0.0, 1.0) = 0.0; // rises as sanity falls
 uniform float time_seed = 0.0;
+uniform float thermal : hint_range(0.0, 1.0) = 0.0; // goggles overlay
 
 float hash12(vec2 p) {
 	vec3 p3 = fract(vec3(p.xyx) * 0.1031);
@@ -35,6 +36,14 @@ void fragment() {
 
 	// Desaturation at low sanity.
 	col = mix(col, vec3(luma), desaturate);
+
+	// Thermal goggles: luma-driven green ramp, hard tunnel vignette.
+	if (thermal > 0.01) {
+		float t_luma = dot(col, vec3(0.299, 0.587, 0.114));
+		vec3 t_col = vec3(t_luma * 0.25, pow(t_luma, 0.6) * 1.15, t_luma * 0.35);
+		float tunnel = smoothstep(0.62, 0.30, length(center_offset));
+		col = mix(col, t_col * tunnel + vec3(0.0, 0.03, 0.01), thermal);
+	}
 
 	// Vignette.
 	float vig = smoothstep(0.85, 0.35, length(center_offset));

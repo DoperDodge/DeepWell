@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FloorDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/floor_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+floor_index = 1
+zone_name = "Entrance Zone"
+grid_width = 24
+grid_height = 24
+target_rooms = 12
+extra_link_fraction = 0.22
+ambient_light = 0.22
+ambience_sound = &"drone_entrance"
+corridor_light_spacing = 2
+corridor_broken_light_chance = 0.06
+light_color = Color(0.95, 0.96, 1.0, 1.0)
+wall_tint = Color(1.05, 1.05, 1.02, 1.0)
+fog_density = 0.015
+exit_label = "Descend to Floor 2 — Administration"
+final_floor = false
+scp_spawns = Array[StringName]([])
+exit_clearance = 1
+pa_lines = Array[String](["Good morning, Site-104. Today's canteen special is vegetable soup.", "All personnel: morning containment checks conclude at 09:00.", "A reminder from Site Security: report unattended items to your sector desk.", "The surface elevator remains out of service. Apologies for the inconvenience."])

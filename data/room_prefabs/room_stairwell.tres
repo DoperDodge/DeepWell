@@ -5,11 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = &"room_stairwell"
-display_name = "Stairwell S-3"
+display_name = "Stairwell"
 size_w = 3
 size_h = 3
 style = "stairwell"
 special = "stairwell"
+floors = Array[int]([1, 2, 3, 4])
 weight = 1.0
 max_instances = 1
 door_clearance = 2

@@ -10,6 +10,7 @@ size_w = 3
 size_h = 3
 style = "containment_cell"
 special = "scp_173_chamber"
+floors = Array[int]([3])
 weight = 1.0
 max_instances = 1
 door_clearance = 0

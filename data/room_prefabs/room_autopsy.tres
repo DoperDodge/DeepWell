@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_autopsy"
+display_name = "Autopsy Suite"
+size_w = 4
+size_h = 3
+style = "autopsy"
+special = ""
+floors = Array[int]([4])
+weight = 2.0
+max_instances = 2
+door_clearance = 0
+powered_down_chance = 0.0
+containers_min = 1
+containers_max = 2
+loot_table = &"medical"
+documents_min = 1
+documents_max = 2
+light_color = Color(0.9, 0.4, 0.35, 1.0)
+broken_light_chance = 0.35
+corpse_chance = 0.4

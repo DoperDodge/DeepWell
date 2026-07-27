@@ -56,7 +56,7 @@ func register_breach(designation: StringName) -> void:
 
 # --- Death / corpse persistence (PLAN §16.3, §20.1) ---
 
-func record_player_death(floor_index: int, cell: Vector2i, cause: String, items: Array) -> void:
+func record_player_death(floor_index: int, cell: Vector2i, cause: String, items: Array, pestilent: bool = false) -> void:
 	site_deaths += 1
 	corpses.append({
 		"floor": floor_index,
@@ -64,6 +64,7 @@ func record_player_death(floor_index: int, cell: Vector2i, cause: String, items:
 		"cause": cause,
 		"designation": GameState.designation,
 		"items": items,
+		"pestilent": pestilent,
 	})
 	log_incident("Subject %s terminated. Cause: %s. Remains unrecovered." % [GameState.designation, cause])
 	save_site()

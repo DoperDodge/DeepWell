@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_biostorage"
+display_name = "Biohazard Storage"
+size_w = 3
+size_h = 3
+style = "storage"
+special = ""
+floors = Array[int]([4])
+weight = 1.8
+max_instances = 2
+door_clearance = 1
+powered_down_chance = 0.4
+containers_min = 2
+containers_max = 3
+loot_table = &"medical"
+documents_min = 0
+documents_max = 0
+light_color = Color(0.92, 0.95, 1.0, 1.0)
+broken_light_chance = 0.35
+corpse_chance = 0.2

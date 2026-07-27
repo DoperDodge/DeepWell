@@ -1,0 +1,17 @@
+{
+ "id": "doc_intake_checklist",
+ "title": "D-Class Intake Checklist (Your Copy)",
+ "doc_type": "form",
+ "found_on_floor": 1,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "FORM 104-D \u2014 SUBJECT COPY\n\n[x] Biometric implant installed\n[x] Personal effects confiscated (claim locker: see processing block)\n[x] Orientation materials issued\n[x] Jumpsuit issued (orange, size approximate)\n[ ] Exit interview\n\nThe last box is printed slightly smaller than the others, as if the form's designer hoped nobody would notice it is never checked.\n\n"
+  },
+  {
+   "clearance": 3,
+   "text": "Print run note (footer, microtype): FORM 104-D REV 9 \u2014 'EXIT INTERVIEW' RETAINED FOR MORALE PURPOSES PER PSYCH DIRECTIVE 22-B.",
+   "redacted_as": ""
+  }
+ ]
+}

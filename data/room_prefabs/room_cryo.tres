@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_cryo"
+display_name = "Cryogenic Storage"
+size_w = 4
+size_h = 4
+style = "cryo"
+special = ""
+floors = Array[int]([4])
+weight = 1.5
+max_instances = 1
+door_clearance = 2
+powered_down_chance = 0.3
+containers_min = 1
+containers_max = 2
+loot_table = &"lab"
+documents_min = 1
+documents_max = 1
+light_color = Color(0.6, 0.75, 0.95, 1.0)
+broken_light_chance = 0.5
+corpse_chance = 0.0

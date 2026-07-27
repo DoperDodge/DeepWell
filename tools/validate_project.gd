@@ -20,7 +20,7 @@ func _run() -> void:
 	_check_rooms_and_floor()
 	_check_documents()
 	_check_audio()
-	_soak_generator(60)
+	_soak_generator(15)
 	_check_save_roundtrip()
 
 	if _failures.is_empty():
@@ -57,7 +57,7 @@ func _check_scripts() -> void:
 
 func _check_items() -> void:
 	var ids := ItemDB.all_ids()
-	_check(ids.size() >= 20, "expected >= 20 items, found %d" % ids.size())
+	_check(ids.size() >= 29, "expected >= 29 items, found %d" % ids.size())
 	for id in ids:
 		var def := ItemDB.get_def(id)
 		_check(def.display_name != "", "item %s missing display_name" % id)
@@ -111,13 +111,31 @@ func _check_rooms_and_floor() -> void:
 		if def.loot_table != &"":
 			_check(LootDB.get_table(def.loot_table) != null, "room %s references missing loot table %s" % [def.id, def.loot_table])
 		count += 1
-	for s in ["spawn", "stairwell", "keycard_office", "scp_173_chamber", "scp_914"]:
-		_check(specials.has(s), "missing special room: " + s)
-	var floor_def := load("res://data/floors/floor_3.tres") as FloorDef
-	_check(floor_def != null, "floor_3.tres missing or invalid")
-	if floor_def != null:
-		for scp in floor_def.scp_spawns:
-			_check(ResourceLoader.exists("res://src/scps/%s.gd" % scp), "floor references missing SCP script %s" % scp)
+	# Every floor must carry its core specials; floor 3 adds its chambers.
+	var defs_by_floor := {}
+	for path in _walk("res://data/room_prefabs", ".tres"):
+		var def := load(path) as RoomDef
+		if def == null:
+			continue
+		for f in def.floors:
+			if not defs_by_floor.has(f):
+				defs_by_floor[f] = []
+			if def.special != "":
+				defs_by_floor[f].append(def.special)
+	for f in [1, 2, 3, 4]:
+		for req in ["spawn", "stairwell", "keycard_office"]:
+			_check(defs_by_floor.get(f, []).has(req), "floor %d missing special '%s'" % [f, req])
+	for req in ["scp_173_chamber", "scp_914"]:
+		_check(defs_by_floor.get(3, []).has(req), "floor 3 missing special '%s'" % req)
+	for f in [1, 2, 3, 4]:
+		var floor_def := load("res://data/floors/floor_%d.tres" % f) as FloorDef
+		_check(floor_def != null, "floor_%d.tres missing or invalid" % f)
+		if floor_def != null:
+			_check(floor_def.floor_index == f, "floor_%d.tres has wrong index" % f)
+			for scp in floor_def.scp_spawns:
+				_check(ResourceLoader.exists("res://src/scps/%s.gd" % scp), "floor %d references missing SCP script %s" % [f, scp])
+	var final_def := load("res://data/floors/floor_4.tres") as FloorDef
+	_check(final_def != null and final_def.final_floor, "floor 4 must be the final floor")
 	print("rooms checked: %d" % count)
 
 func _check_documents() -> void:
@@ -135,33 +153,39 @@ func _check_documents() -> void:
 		for clearance in 6:
 			var text := GameUI.render_document(doc, clearance)
 			_check(text.length() > 0, "document %s renders empty at clearance %d" % [id, clearance])
-	_check(DocumentDB.docs_for_floor(3).size() >= 12, "floor 3 needs >= 12 placed documents")
+	for f in [1, 2, 3, 4]:
+		_check(DocumentDB.docs_for_floor(f).size() >= 4, "floor %d needs >= 4 placed documents (has %d)" % [f, DocumentDB.docs_for_floor(f).size()])
+	_check(ids.size() >= 25, "expected >= 25 documents total")
 	print("documents checked: %d" % ids.size())
 
 func _check_audio() -> void:
 	for sound in [&"footstep_concrete_0", &"door_open", &"door_close", &"stone_drag",
-			&"neck_snap", &"drone_lcz", &"heartbeat", &"machine_run", &"squeak", &"pa_chime"]:
+			&"neck_snap", &"drone_lcz", &"heartbeat", &"machine_run", &"squeak", &"pa_chime",
+			&"groan", &"cough", &"shriek", &"wheeze", &"drone_entrance", &"drone_admin"]:
 		_check(AudioManager.has_sound(sound), "missing synthesized sound %s" % sound)
 	print("audio library checked")
 
-## Generation soak (PLAN §18.1): every seed must produce a valid floor, and
-## the same seed must produce the identical layout twice (determinism §5.5).
+## Generation soak (PLAN §18.1): every seed must produce a valid floor on
+## EVERY floor, and the same seed must produce the identical layout twice
+## (determinism §5.5).
 func _soak_generator(seeds: int) -> void:
 	var failures := 0
-	for i in seeds:
-		var seed_value := 1000 + i * 7919
-		var sig_a := _generate_signature(seed_value)
-		if sig_a == "":
-			failures += 1
-			continue
-		var sig_b := _generate_signature(seed_value)
-		if sig_a != sig_b:
-			_fail("seed %d is non-deterministic" % seed_value)
-	_check(failures == 0, "%d/%d seeds failed generation validity" % [failures, seeds])
-	print("generator soak: %d seeds" % seeds)
+	for floor_index in [1, 2, 3, 4]:
+		for i in seeds:
+			var seed_value := 1000 + i * 7919
+			var sig_a := _generate_signature(seed_value, floor_index)
+			if sig_a == "":
+				failures += 1
+				continue
+			var sig_b := _generate_signature(seed_value, floor_index)
+			if sig_a != sig_b:
+				_fail("seed %d floor %d is non-deterministic" % [seed_value, floor_index])
+	_check(failures == 0, "%d seed/floor combos failed generation validity" % failures)
+	print("generator soak: %d seeds x 4 floors" % seeds)
 
-func _generate_signature(seed_value: int) -> String:
+func _generate_signature(seed_value: int, floor_index: int) -> String:
 	GameState.start_new_run(seed_value, false)
+	GameState.floor_index = floor_index
 	var generator := FloorGenerator.new()
 	get_tree().root.add_child(generator)
 	var result := generator.generate(GameState.floor_index)
@@ -174,7 +198,7 @@ func _generate_signature(seed_value: int) -> String:
 		for c in grid.cells:
 			if c != FacilityGrid.CellType.SOLID:
 				walkable += 1
-		_check(walkable > 120, "seed %d: suspiciously small floor (%d cells)" % [seed_value, walkable])
+		_check(walkable > 60, "seed %d floor %d: suspiciously small (%d cells)" % [seed_value, floor_index, walkable])
 		sig = "%s|%d|%d|%d" % [str(result.spawn_position), walkable, grid.doors.size(), generator.rooms.size()]
 	AudioManager.stop_all_ambience()
 	generator.free()

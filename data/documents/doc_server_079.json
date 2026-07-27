@@ -1,0 +1,22 @@
+{
+ "id": "doc_server_079",
+ "title": "Server Room Work Order \u2014 DO NOT POWER RACK 9",
+ "doc_type": "work_order",
+ "found_on_floor": 2,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "WORK ORDER 3390 \u2014 SERVER ROOM\nFault: Rack 9 draws power while physically disconnected.\nPriority: URGENT \u2014 REFERRED TO SITE COMMAND\n\nTechnician note: unplugged rack 9 at 14:05. At 14:11 the rack's activity lights resumed. The switch port it used to occupy now shows traffic from a device identifying itself as "
+  },
+  {
+   "clearance": 2,
+   "text": "an Exidy Sorcerer microcomputer, manufacture year 1978",
+   "redacted_as": "[DEVICE ID REDACTED]"
+  },
+  {
+   "clearance": 3,
+   "text": ". Site Command's response, in full: 'That unit is not scheduled for transfer to Site-104 until next quarter. Disconnect nothing else. Tell no one.'",
+   "redacted_as": "[RESPONSE SEALED]"
+  }
+ ]
+}

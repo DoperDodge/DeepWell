@@ -25,6 +25,10 @@ const LOUDNESS := {
 }
 
 var stamina: float = STAMINA_MAX
+
+func stamina_max() -> float:
+	var bonus := 30.0 if GameState.occupation == &"athlete" else 0.0
+	return STAMINA_MAX + bonus + _player.skills.level(&"fitness") * 8.0
 var crouched: bool = false
 var move_state: String = "walk" # crouch|walk|run|sprint (current gait)
 var is_moving: bool = false
@@ -35,6 +39,8 @@ var _step_accum: float = 0.0
 var _fall_peak_speed: float = 0.0
 var _was_on_floor: bool = true
 var _footstep_rng := RandomNumberGenerator.new()
+var _sprint_time: float = 0.0
+var _wheeze_timer: float = 0.0
 
 func _ready() -> void:
 	_player = get_parent() as CharacterBody3D
@@ -63,14 +69,22 @@ func _physics_process(delta: float) -> void:
 		stamina = maxf(stamina - STAMINA_SPRINT_COST * delta, 0.0)
 		_regen_delay = STAMINA_REGEN_DELAY
 		_player.needs.exertion = 2.5
+		_sprint_time += delta
+		_player.skills.add_xp(&"fitness", delta * 2.0)
 	else:
+		# Asthmatic: a long sprint buys you a loud, involuntary wheeze after.
+		if GameState.has_trait(&"asthmatic") and _sprint_time > 3.0:
+			_wheeze_timer = 4.0
+			_sprint_time = 0.0
+		elif _sprint_time > 0.0 and move_state != "sprint":
+			_sprint_time = 0.0
 		_player.needs.exertion = 1.4 if (move_state == "run" and is_moving) else 1.0
 		_regen_delay -= delta
 		if _regen_delay <= 0.0:
 			var regen := STAMINA_REGEN
 			if _player.needs.get_value(&"fatigue") > 80.0:
 				regen *= 0.4
-			stamina = minf(stamina + regen * delta, STAMINA_MAX)
+			stamina = minf(stamina + regen * delta, stamina_max())
 
 	if not _player.is_on_floor():
 		_player.velocity.y -= GRAVITY * delta
@@ -88,6 +102,12 @@ func _physics_process(delta: float) -> void:
 		_player.velocity.x = move_toward(_player.velocity.x, 0, speed * 8.0 * delta)
 		_player.velocity.z = move_toward(_player.velocity.z, 0, speed * 8.0 * delta)
 
+	if _wheeze_timer > 0.0:
+		_wheeze_timer -= delta
+		if fmod(_wheeze_timer, 1.3) < delta:
+			AudioManager.play_3d(&"wheeze", _player.global_position, -8.0)
+			EventBus.noise_emitted.emit(_player.global_position, 0.3, _player, ["wheeze", "human"])
+
 	_player.move_and_slide()
 	_check_landing()
 	_footsteps(delta, speed)
@@ -104,7 +124,8 @@ func _current_speed(wants_sprint: bool, encumbrance: int) -> float:
 		return SPEED_CROUCH * mobility * enc_mult
 	if wants_sprint and stamina > 4.0 and encumbrance == 0 and mobility > 0.6:
 		move_state = "sprint"
-		return SPEED_SPRINT * mobility
+		var sprint_speed := SPEED_SPRINT + (0.6 if GameState.occupation == &"athlete" else 0.0)
+		return sprint_speed * mobility
 	if wants_sprint:
 		move_state = "run" # too winded/laden to sprint — downgraded, still loud
 		return SPEED_RUN * mobility * enc_mult
@@ -148,12 +169,21 @@ func _footsteps(delta: float, speed: float) -> void:
 	if _step_accum >= stride:
 		_step_accum = 0.0
 		_emit_footstep(current_loudness())
+		if crouched:
+			_player.skills.add_xp(&"lightfooted", 1.0)
 
 func current_loudness() -> float:
 	var loudness: float = LOUDNESS.get(move_state, 0.25)
 	if _player.inventory.encumbrance_tier() >= 2:
 		loudness = minf(loudness + 0.15, 1.0) # heavy load is loud (§10.1)
-	return loudness
+	if GameState.has_trait(&"light_step"):
+		loudness *= 0.75
+	if GameState.occupation == &"burglar":
+		loudness *= 0.6
+	# Lightfooted: trained by sneaking, up to -40% (PLAN §10.7 — "the single
+	# most valuable skill in this game").
+	loudness *= 1.0 - 0.04 * _player.skills.level(&"lightfooted")
+	return maxf(loudness, 0.03)
 
 func _emit_footstep(loudness: float) -> void:
 	EventBus.noise_emitted.emit(_player.global_position, loudness, _player, ["footstep", "human"])

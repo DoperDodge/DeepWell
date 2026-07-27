@@ -1,0 +1,17 @@
+{
+ "id": "doc_autopsy_log",
+ "title": "Autopsy Log \u2014 Subject W-4411",
+ "doc_type": "test_log",
+ "found_on_floor": 4,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "AUTOPSY LOG \u2014 SUBJECT W-4411 (guard, deceased)\n\nExternal: crude surgical intervention post-mortem. Incisions closed with black cord of unknown composition. The work is confident. Practiced. Almost caring.\n\nInternal: [see attached \u2014 attachment missing]\n\nNote from examining physician: the subject's heart shows no cause of arrest. It simply stopped, completely and simultaneously in every fiber, the way a machine stops when someone flips its switch.\n\n"
+  },
+  {
+   "clearance": 3,
+   "text": "Subject W-4411 was logged banging on the morgue drawer from the inside six hours after this examination. Reclassified SCP-049-2. The examining physician has requested transfer. Request denied \u2014 we need her here.",
+   "redacted_as": "[ADDENDUM SEALED]"
+  }
+ ]
+}

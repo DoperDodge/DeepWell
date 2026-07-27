@@ -5,11 +5,12 @@
 [resource]
 script = ExtResource("1")
 id = &"room_lab"
-display_name = "Wet Lab 3"
+display_name = "Wet Lab"
 size_w = 4
 size_h = 3
 style = "lab"
 special = ""
+floors = Array[int]([3, 4])
 weight = 2.0
 max_instances = 2
 door_clearance = 0

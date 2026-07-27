@@ -1,0 +1,17 @@
+{
+ "id": "doc_cryo_manifest",
+ "title": "Cryogenic Storage Manifest",
+ "doc_type": "log",
+ "found_on_floor": 4,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "CRYOGENIC STORAGE \u2014 CONTENTS MANIFEST\n\nPods 1-6: biological samples, catalogued\nPod 7: [ENTRY REMOVED]\nPod 8: biological samples, catalogued\nPods 9-12: VACANT\n\nMaintenance note: Pod 7's power draw is triple specification and climbing. Its occupancy sensor reads VACANT. Its weight sensor reads 400 kg. These readings are simultaneous.\n\n"
+  },
+  {
+   "clearance": 4,
+   "text": "Pod 7 was sealed by order of O5-7 under designation [PENDING]. It is not to be opened, thawed, weighed, or discussed. This manifest line exists because deleting it caused it to reappear.",
+   "redacted_as": "[ENTRY REMOVED]"
+  }
+ ]
+}

@@ -132,6 +132,12 @@ func _build_library() -> void:
 	_library[&"fluoro_hum"] = _make_hum()
 	_library[&"alarm"] = _make_alarm()
 	_library[&"rumble_low"] = _make_drone(31.0, 0.8, true)
+	_library[&"groan"] = _make_groan()
+	_library[&"cough"] = _make_cough()
+	_library[&"shriek"] = _make_shriek()
+	_library[&"wheeze"] = _make_wheeze()
+	_library[&"drone_entrance"] = _make_hum2()
+	_library[&"drone_admin"] = _make_drone(74.0, 0.35, true)
 
 func _buf(seconds: float) -> PackedFloat32Array:
 	var b := PackedFloat32Array()
@@ -458,6 +464,61 @@ func _make_hum() -> AudioStreamWAV:
 	_add_noise(fizz, 0.05)
 	_highpass(fizz, 4000.0)
 	_mix(b, fizz, 0.0, 0.4)
+	return _to_wav(b, true)
+
+func _make_groan() -> AudioStreamWAV:
+	var b := _buf(1.5)
+	_add_sine(b, 82.0, 0.3, 64.0)
+	_add_sine(b, 165.0, 0.14, 130.0)
+	_add_sine(b, 249.0, 0.06, 200.0)
+	var breath := _buf(1.5)
+	_add_noise(breath, 0.15)
+	_lowpass(breath, 900.0)
+	_mix(b, breath, 0.0, 0.6)
+	_tremolo(b, 5.5, 0.35)
+	_envelope(b, 0.25, 1.6)
+	return _to_wav(b)
+
+func _make_cough() -> AudioStreamWAV:
+	var b := _buf(0.8)
+	for i in 2:
+		var c := _buf(0.22)
+		_add_noise(c, 0.9)
+		_lowpass(c, 1600.0)
+		_add_sine(c, 130.0, 0.3, 90.0)
+		_envelope(c, 0.004, 4.0)
+		_mix(b, c, 0.3 * i)
+	return _to_wav(b)
+
+func _make_shriek() -> AudioStreamWAV:
+	var b := _buf(0.9)
+	_add_sine(b, 1900.0, 0.22, 2600.0)
+	_add_sine(b, 950.0, 0.18, 1400.0)
+	var hiss := _buf(0.9)
+	_add_noise(hiss, 0.4)
+	_highpass(hiss, 2500.0)
+	_mix(b, hiss, 0.0, 0.6)
+	_tremolo(b, 22.0, 0.5)
+	_envelope(b, 0.02, 2.2)
+	return _to_wav(b)
+
+func _make_wheeze() -> AudioStreamWAV:
+	var b := _buf(1.1)
+	_add_noise(b, 0.3)
+	_highpass(b, 700.0)
+	_lowpass(b, 2400.0)
+	_tremolo(b, 2.6, 0.9)
+	_envelope(b, 0.2, 1.5)
+	return _to_wav(b)
+
+func _make_hum2() -> AudioStreamWAV:
+	var b := _buf(4.0)
+	_add_sine(b, 120.0, 0.06)
+	_add_sine(b, 240.0, 0.03)
+	var air := _buf(4.0)
+	_add_brown(air, 0.3)
+	_lowpass(air, 500.0)
+	_mix(b, air, 0.0, 0.4)
 	return _to_wav(b, true)
 
 func _make_alarm() -> AudioStreamWAV:

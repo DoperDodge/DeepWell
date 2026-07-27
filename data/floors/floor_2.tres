@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FloorDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/floor_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+floor_index = 2
+zone_name = "Administration & Personnel"
+grid_width = 30
+grid_height = 30
+target_rooms = 18
+extra_link_fraction = 0.22
+ambient_light = 0.1
+ambience_sound = &"drone_admin"
+corridor_light_spacing = 3
+corridor_broken_light_chance = 0.35
+light_color = Color(0.95, 0.9, 0.78, 1.0)
+wall_tint = Color(1.0, 0.97, 0.9, 1.0)
+fog_density = 0.024
+exit_label = "Descend to Floor 3 — Light Containment"
+final_floor = false
+scp_spawns = Array[StringName]([&"scp_966", &"scp_966"])
+exit_clearance = 2
+pa_lines = Array[String](["Personnel are reminded that dormitory curfew is in effect.", "The infirmary is experiencing higher than usual demand. Non-urgent cases, return tomorrow.", "Would the owner of the thermal imaging unit checked out on the 12th return it to Security.", "If you have not slept in more than forty hours, report to the infirmary. This message repeats.", "Night shift staffing has been reduced. Please do not ask why."])

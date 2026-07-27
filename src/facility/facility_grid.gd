@@ -23,6 +23,8 @@ var room_ids: PackedInt32Array       # room index per cell, -1 = none
 
 ## Edge doors: key = _edge_key(a, b) -> {open: bool, blast: bool, id: String}
 var doors: Dictionary = {}
+## Edge key -> Door node (for entities that can operate doors, e.g. SCP-049).
+var door_nodes: Dictionary = {}
 
 var _nav := AStar2D.new()
 var _open := AStar2D.new()
@@ -79,6 +81,16 @@ func add_door(a: Vector2i, b: Vector2i, door_id: String, blast: bool) -> void:
 
 func has_door(a: Vector2i, b: Vector2i) -> bool:
 	return doors.has(_edge_key(a, b))
+
+func register_door_node(a: Vector2i, b: Vector2i, node: Node) -> void:
+	door_nodes[_edge_key(a, b)] = node
+
+func door_node(a: Vector2i, b: Vector2i) -> Node:
+	return door_nodes.get(_edge_key(a, b))
+
+func is_door_open(a: Vector2i, b: Vector2i) -> bool:
+	var key := _edge_key(a, b)
+	return doors.has(key) and doors[key].open
 
 func set_door_open(a: Vector2i, b: Vector2i, open: bool) -> void:
 	var key := _edge_key(a, b)

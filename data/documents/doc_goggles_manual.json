@@ -1,0 +1,17 @@
+{
+ "id": "doc_goggles_manual",
+ "title": "Thermal Imaging Unit \u2014 Field Card",
+ "doc_type": "manual",
+ "found_on_floor": 2,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "THERMAL IMAGING UNIT \u2014 QUICK REFERENCE\n\n\u2022 Power: sealed cell, ~5 minutes continuous. Conserve.\n\u2022 The unit renders heat, not light. Warm bodies read white.\n\u2022 Peripheral vision is severely restricted while worn. Remove before moving through contested corridors.\n\nSECURITY ADDENDUM: If a heat signature appears at rest in a corridor you believed empty \u2014 DO NOT RUN. Entities of this class respond to exhaustion and to stillness. Stay rested. Keep moving. Never sleep on this floor.\n\n"
+  },
+  {
+   "clearance": 1,
+   "text": "(Handwritten: they took our goggles when the requisitions were cut. There is one pair left somewhere in the server room or on whoever died wearing them.)",
+   "redacted_as": ""
+  }
+ ]
+}

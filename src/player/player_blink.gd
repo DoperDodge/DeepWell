@@ -67,7 +67,12 @@ func _start_blink(duration: float) -> void:
 	EventBus.player_blinked.emit(duration)
 
 func _schedule_next() -> void:
-	_next_blink = RNG.stream(&"blink").randf_range(BLINK_INTERVAL_MIN, BLINK_INTERVAL_MAX)
+	var mult := 1.0
+	if GameState.has_trait(&"steady_hands"):
+		mult = 1.45 # slower blinking — enormous for 173 (PLAN §10.8)
+	elif GameState.has_trait(&"twitchy"):
+		mult = 0.65 # the 173 nightmare trait
+	_next_blink = RNG.stream(&"blink").randf_range(BLINK_INTERVAL_MIN, BLINK_INTERVAL_MAX) * mult
 
 ## Exhaustion and terror make you blink faster. This is what kills you.
 func _fatigue_factor() -> float:

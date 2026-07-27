@@ -38,7 +38,7 @@ func setup(grid: FacilityGrid, a: Vector2i, b: Vector2i, p_clearance: int, blast
 	clearance = p_clearance
 	is_blast = blast
 	state = initial_state
-	door_id = "door_%d_%d__%d_%d" % [a.x, a.y, b.x, b.y]
+	door_id = "f%d_door_%d_%d__%d_%d" % [GameState.floor_index, a.x, a.y, b.x, b.y]
 	# Restore persisted state (welded stays welded, opened stays open).
 	if FacilityState.door_states.has(door_id):
 		state = int(FacilityState.door_states[door_id])
@@ -103,6 +103,7 @@ func _ready() -> void:
 		add_child(label)
 
 	_apply_state_visual(true)
+	_grid.register_door_node(cell_a, cell_b, self)
 
 func _wall_material() -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -183,7 +184,21 @@ func interact(player: Node) -> void:
 			pass
 
 func _has_crowbar(player: Node) -> bool:
-	return player != null and "inventory" in player and player.inventory.has_item(&"crowbar")
+	if player == null or not "inventory" in player:
+		return false
+	# Former electricians hotwire dead readers barehanded (PLAN §10.8).
+	if GameState.occupation == &"electrician" and state == DoorState.POWERED_DOWN:
+		return true
+	return player.inventory.has_item(&"crowbar")
+
+## Some things do not need keycards (SCP-049 on his rounds). Welded doors
+## alone refuse them — welding is the counterplay (PLAN §10.11).
+func force_open_for_entity() -> void:
+	if state == DoorState.WELDED or state == DoorState.OPEN or _busy:
+		return
+	state = DoorState.UNLOCKED
+	_persist()
+	_open_door()
 
 func _open_door() -> void:
 	_busy = true

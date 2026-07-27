@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_lobby"
+display_name = "Reception Atrium"
+size_w = 5
+size_h = 4
+style = "lobby"
+special = ""
+floors = Array[int]([1])
+weight = 2.5
+max_instances = 1
+door_clearance = 0
+powered_down_chance = 0.0
+containers_min = 0
+containers_max = 1
+loot_table = &"generic"
+documents_min = 1
+documents_max = 2
+light_color = Color(0.95, 0.96, 1.0, 1.0)
+broken_light_chance = 0.05
+corpse_chance = 0.0

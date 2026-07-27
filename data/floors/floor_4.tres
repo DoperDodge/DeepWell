@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FloorDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/floor_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+floor_index = 4
+zone_name = "Research & Testing"
+grid_width = 34
+grid_height = 34
+target_rooms = 20
+extra_link_fraction = 0.22
+ambient_light = 0.028
+ambience_sound = &"rumble_low"
+corridor_light_spacing = 4
+corridor_broken_light_chance = 0.6
+light_color = Color(0.9, 0.25, 0.2, 1.0)
+wall_tint = Color(0.85, 0.72, 0.7, 1.0)
+fog_density = 0.04
+exit_label = "Enter the deep service elevator"
+final_floor = true
+scp_spawns = Array[StringName]([&"scp_049", &"scp_049_2", &"scp_049_2", &"scp_049_2"])
+exit_clearance = 3
+pa_lines = Array[String](["Emergency power active. Non-essential systems offline.", "Medical staff to Research Wing 4. Medical staff to— to Research Wing 4. Medical staff to—", "Quarantine protocol remains active on this floor. Do not approach personnel exhibiting fever symptoms.", "The doctor will see you now."])

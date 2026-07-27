@@ -1,0 +1,17 @@
+{
+ "id": "doc_evac_notice",
+ "title": "Notice: Elevator Out of Service",
+ "doc_type": "notice",
+ "found_on_floor": 1,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "NOTICE TO ALL PERSONNEL\n\nThe surface elevator is OUT OF SERVICE pending inspection.\n\nIn the event of a site emergency, personnel should proceed to their sector muster points and await instruction. Do not attempt to use the stairwells to ascend: stairwell access above Floor 1 is sealed as a containment measure.\n\nWe appreciate your patience.\n\n\u2014 Facilities\n\n"
+  },
+  {
+   "clearance": 1,
+   "text": "(Someone has written underneath, in ballpoint, pressed hard: THE ELEVATOR HAS BEEN 'PENDING INSPECTION' FOR THREE YEARS. NOBODY LEAVES. ASK YOURSELF WHY THE STAIRS ONLY GO DOWN.)",
+   "redacted_as": ""
+  }
+ ]
+}

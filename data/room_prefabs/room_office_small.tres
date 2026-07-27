@@ -10,6 +10,7 @@ size_w = 3
 size_h = 3
 style = "office"
 special = ""
+floors = Array[int]([1, 2, 3])
 weight = 3.0
 max_instances = 4
 door_clearance = 0
