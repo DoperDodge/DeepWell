@@ -12,3 +12,6 @@ echo "== import =="
 
 echo "== validate =="
 "$GODOT" --headless --path . -- --validate
+
+echo "== ui probe =="
+"$GODOT" --headless --path . -- --uiprobe

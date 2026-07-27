@@ -28,25 +28,27 @@ const TRAITS := [
 
 var _seed_edit: LineEdit
 var _credits_panel: PanelContainer
+var _credits_overlay: Control
 var _intake_panel: PanelContainer
+var _intake_overlay: Control
 var _occupation_index: int = 0
 var _trait_checks: Dictionary = {}
 var _points_label: Label
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	UILayout.fullscreen(self)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	var bg := ColorRect.new()
 	bg.color = Color(0.015, 0.017, 0.02)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
+	UILayout.fullscreen(bg)
 
+	var wrap := UILayout.center_overlay(self)
 	var column := VBoxContainer.new()
-	column.set_anchors_preset(Control.PRESET_CENTER)
-	column.custom_minimum_size = Vector2(460, 0)
-	column.position -= Vector2(230, 220)
+	column.custom_minimum_size = Vector2(500, 0)
 	column.add_theme_constant_override("separation", 10)
-	add_child(column)
+	(wrap.center as Control).add_child(column)
 
 	var title := Label.new()
 	title.text = "PROJECT DEEPWELL"
@@ -89,23 +91,32 @@ func _ready() -> void:
 	quit.pressed.connect(func() -> void: get_tree().quit())
 	column.add_child(quit)
 
+	# Controls footer: bottom-centered by a container, not by arithmetic.
+	var footer := VBoxContainer.new()
+	footer.alignment = BoxContainer.ALIGNMENT_END
+	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	footer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(footer)
+	UILayout.fullscreen(footer)
 	var controls := Label.new()
 	controls.text = "WASD move · SHIFT sprint · C crouch · E interact · F flashlight · TAB inventory\nJ journal · Q/R lean · B blink now · hold RMB to keep your eyes open · F3 debug"
 	controls.add_theme_font_size_override("font_size", 12)
 	controls.add_theme_color_override("font_color", Color(0.45, 0.47, 0.5))
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	controls.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	controls.position += Vector2(-330, -60)
-	add_child(controls)
+	controls.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	footer.add_child(controls)
+	var footer_pad := Control.new()
+	footer_pad.custom_minimum_size = Vector2(0, 26)
+	footer.add_child(footer_pad)
 
 ## Intake: occupation, traits (point-buy, PLAN §10.8), sandbox, seed.
 func _open_intake() -> void:
-	if _intake_panel != null:
-		_intake_panel.queue_free()
+	if _intake_overlay != null:
+		_intake_overlay.queue_free()
+	var wrap := UILayout.center_overlay(self, true)
+	_intake_overlay = wrap.root
 	_intake_panel = PanelContainer.new()
-	_intake_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_intake_panel.position -= Vector2(390, 290)
-	add_child(_intake_panel)
+	(wrap.center as Control).add_child(_intake_panel)
 	var box := VBoxContainer.new()
 	box.custom_minimum_size = Vector2(780, 0)
 	box.add_theme_constant_override("separation", 6)
@@ -189,7 +200,8 @@ func _open_intake() -> void:
 	seed_row.add_child(begin)
 	var cancel := _button("Cancel")
 	cancel.pressed.connect(func() -> void:
-		_intake_panel.queue_free()
+		_intake_overlay.queue_free()
+		_intake_overlay = null
 		_intake_panel = null)
 	seed_row.add_child(cancel)
 	box.add_child(seed_row)
@@ -258,15 +270,15 @@ func _on_start() -> void:
 	start_requested.emit(seed_value, true)
 
 func _show_credits() -> void:
-	if _credits_panel != null:
-		_credits_panel.queue_free()
-		_credits_panel = null
+	if _credits_overlay != null:
+		_credits_overlay.queue_free()
+		_credits_overlay = null
 		return
+	var wrap := UILayout.center_overlay(self, true)
+	_credits_overlay = wrap.root
 	_credits_panel = PanelContainer.new()
-	_credits_panel.set_anchors_preset(Control.PRESET_CENTER)
 	_credits_panel.custom_minimum_size = Vector2(720, 480)
-	_credits_panel.position -= Vector2(360, 240)
-	add_child(_credits_panel)
+	(wrap.center as Control).add_child(_credits_panel)
 	var scroll := ScrollContainer.new()
 	_credits_panel.add_child(scroll)
 	var text := RichTextLabel.new()

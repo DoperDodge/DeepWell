@@ -23,6 +23,10 @@ func _ready() -> void:
 		var smoke: Node = (load("res://tools/smoke_test.gd") as GDScript).new()
 		add_child(smoke)
 		return
+	if OS.get_cmdline_user_args().has("--uiprobe"):
+		var probe: Node = (load("res://tools/ui_probe.gd") as GDScript).new()
+		add_child(probe)
+		return
 	_show_menu()
 
 func _on_restart_requested(keep_site: bool) -> void:
