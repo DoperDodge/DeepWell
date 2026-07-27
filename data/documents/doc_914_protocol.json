@@ -1,0 +1,30 @@
+{
+ "id": "doc_914_protocol",
+ "title": "SCP-914 Operating Protocol \u2014 Floor 3",
+ "doc_type": "procedure",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "SCP-914 TESTING BAY \u2014 OPERATING PROTOCOL (Rev. 11)\n\n1. Only inorganic test objects approved on Form 914-T.\n2. Set the selection dial BEFORE loading the intake booth.\n3. NEVER insert living matter. "
+  },
+  {
+   "clearance": 2,
+   "text": "See Incident 914-0826 for why this instruction is now in bold.",
+   "redacted_as": "[REDACTED]"
+  },
+  {
+   "clearance": 0,
+   "text": "\n\nSetting guide (informal, per Dr. Ellery):\n- ROUGH: destroys. Occasionally useful for disposal.\n- COARSE: breaks into parts.\n- 1:1: same thing, different instance. Repairs, sometimes.\n- FINE: improvement. This is the one you want.\n- VERY FINE: improvement, loosely defined. "
+  },
+  {
+   "clearance": 1,
+   "text": "Keycards processed on FINE have returned at one clearance level higher. This is now the single largest unlogged use of the machine and the Director has stopped pretending not to know.",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+  },
+  {
+   "clearance": 0,
+   "text": "\n\nAll uses are logged automatically to the site incident record."
+  }
+ ]
+}

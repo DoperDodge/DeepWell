@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bored"
+display_name = "Bored"
+stat = &"boredom"
+thresholds = Array[float]([45.0, 65.0, 82.0, 94.0])
+labels = Array[String](["Restless", "Bored", "Numb", "Switched Off"])
+color = Color(0.55, 0.55, 0.6, 1.0)
+hint = "Documents cure this. Knowledge is a side effect."

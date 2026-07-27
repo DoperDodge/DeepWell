@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cold_key"
+display_name = "Cold Brass Key"
+description = "A key to a door that does not exist in this site. It is very cold and it does not warm up."
+weight_kg = 0.05
+world_shape = "box"
+world_color = Color(0.75, 0.65, 0.35, 1.0)
+world_size = Vector3(0.02, 0.01, 0.07)
+categories = Array[StringName]([&"anomalous"])

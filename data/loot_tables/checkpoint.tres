@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"checkpoint"
+rolls_min = 1
+rolls_max = 2
+empty_chance = 0.25
+entries = Array[Dictionary]([{"item": &"battery", "weight": 1.5, "min": 1, "max": 2}, {"item": &"keycard_l1", "weight": 0.6, "min": 1, "max": 1}, {"item": &"cigarettes", "weight": 1, "min": 1, "max": 3}, {"item": &"painkillers", "weight": 0.7, "min": 1, "max": 1}])

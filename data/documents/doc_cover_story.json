@@ -1,0 +1,18 @@
+{
+ "id": "doc_cover_story",
+ "title": "Draft Press Statement \u2014 DO NOT RELEASE",
+ "doc_type": "memo",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 1,
+   "text": "DRAFT \u2014 REGIONAL PRESS STATEMENT\n\nA structural collapse at a decommissioned deep-storage facility has resulted in the loss of the site. There were no personnel on-site at the time of the incident. The area poses no risk to the public.\n\n",
+   "redacted_as": "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+  },
+  {
+   "clearance": 4,
+   "text": "Annotation, O5 liaison: approved for use in the event of a GLASS COFFIN conclusion. The phrase 'no personnel on-site' is accurate as of the moment of release, by definition: reclassification of on-site persons to materiel completes at detonation.",
+   "redacted_as": "[REMAINDER SEALED]"
+  }
+ ]
+}

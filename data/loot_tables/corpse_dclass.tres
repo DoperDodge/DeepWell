@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"corpse_dclass"
+rolls_min = 1
+rolls_max = 2
+empty_chance = 0.35
+entries = Array[Dictionary]([{"item": &"snack_bar", "weight": 1.5, "min": 1, "max": 1}, {"item": &"ripped_sheet", "weight": 1.5, "min": 1, "max": 2}, {"item": &"cigarettes", "weight": 1, "min": 1, "max": 2}])

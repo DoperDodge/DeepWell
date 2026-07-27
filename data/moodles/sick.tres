@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sick"
+display_name = "Sick"
+stat = &"sickness"
+thresholds = Array[float]([15.0, 40.0, 65.0, 85.0])
+labels = Array[String](["Queasy", "Sick", "Very Sick", "Failing"])
+color = Color(0.6, 0.8, 0.4, 1.0)
+hint = "Coughing is loud. Sepsis is louder, then quiet."

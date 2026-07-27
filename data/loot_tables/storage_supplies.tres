@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/loot_table.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"storage_supplies"
+rolls_min = 2
+rolls_max = 3
+empty_chance = 0.2
+entries = Array[Dictionary]([{"item": &"scrap_metal", "weight": 2, "min": 1, "max": 2}, {"item": &"ripped_sheet", "weight": 1.5, "min": 1, "max": 3}, {"item": &"battery", "weight": 1.2, "min": 1, "max": 2}, {"item": &"canned_beans", "weight": 1.2, "min": 1, "max": 1}, {"item": &"crowbar", "weight": 0.4, "min": 1, "max": 1}, {"item": &"wire_spool", "weight": 1, "min": 1, "max": 1}, {"item": &"splint", "weight": 0.5, "min": 1, "max": 1}])

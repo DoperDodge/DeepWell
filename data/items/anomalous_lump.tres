@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"anomalous_lump"
+display_name = "Warm Grey Lump"
+description = "Output of SCP-914 on Very Fine. It is slightly warm. It is always slightly warm."
+weight_kg = 0.5
+world_shape = "sphere"
+world_color = Color(0.55, 0.55, 0.58, 1.0)
+world_size = Vector3(0.12, 0.12, 0.12)
+categories = Array[StringName]([&"anomalous"])

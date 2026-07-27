@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cigarettes"
+display_name = "Cigarettes"
+description = "Contraband, or currency, depending on the floor. Steadies the hands."
+weight_kg = 0.05
+max_stack = 10
+world_shape = "box"
+world_color = Color(0.85, 0.85, 0.8, 1.0)
+world_size = Vector3(0.09, 0.03, 0.06)
+categories = Array[StringName]([&"comfort"])
+use_behavior = "consume"
+sanity_restore = 6.0
+thirst_restore = -4.0
+boredom_relief = 10.0

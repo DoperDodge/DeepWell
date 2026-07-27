@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flashlight"
+display_name = "Flashlight"
+description = "Foundation-issue anglehead torch. Light holds the Sculpture — and tells everything else where you are."
+weight_kg = 0.45
+world_shape = "cylinder"
+world_color = Color(0.75, 0.55, 0.1, 1.0)
+world_size = Vector3(0.08, 0.24, 0.08)
+categories = Array[StringName]([&"light", &"tool"])
+use_behavior = "flashlight"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"heavy_load"
+display_name = "Heavy Load"
+stat = &"encumbrance"
+thresholds = Array[float]([70.0, 85.0, 100.0, 118.0])
+labels = Array[String](["Laden", "Heavy Load", "Overloaded", "Immobile"])
+color = Color(0.7, 0.6, 0.4, 1.0)
+hint = "Drop something. Encumbrance is footstep volume."

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Project DEEPWELL icon — original work, CC BY-SA 3.0.
+       A well shaft descending into dark: concentric rings over a black drop. -->
+  <rect width="128" height="128" rx="14" fill="#0a0c0e"/>
+  <circle cx="64" cy="64" r="46" fill="none" stroke="#4a5560" stroke-width="5"/>
+  <circle cx="64" cy="64" r="32" fill="none" stroke="#3a434c" stroke-width="4"/>
+  <circle cx="64" cy="64" r="20" fill="none" stroke="#2b3138" stroke-width="3"/>
+  <circle cx="64" cy="64" r="10" fill="#000000"/>
+  <path d="M 22 64 L 34 64" stroke="#c46a1b" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 94 64 L 106 64" stroke="#c46a1b" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 64 106 L 64 118" stroke="#c46a1b" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tired"
+display_name = "Tired"
+stat = &"fatigue"
+thresholds = Array[float]([45.0, 65.0, 82.0, 93.0])
+labels = Array[String](["Drowsy", "Tired", "Exhausted", "Collapsing"])
+color = Color(0.6, 0.5, 0.85, 1.0)
+hint = "Blink rate is climbing. You know what that means here."

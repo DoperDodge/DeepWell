@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"scp_500_pill"
+display_name = "Red Pill (SCP-500)"
+description = "A single red pill from a mostly-empty bottle marked 500. Cures anything. There will not be another."
+weight_kg = 0.01
+world_shape = "sphere"
+world_color = Color(0.85, 0.1, 0.1, 1.0)
+world_size = Vector3(0.05, 0.05, 0.05)
+categories = Array[StringName]([&"medical", &"anomalous"])
+use_behavior = "medical"
+behavior_params = {"medical_kind": "panacea", "power": 1.0}

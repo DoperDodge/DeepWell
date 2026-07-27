@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"panic"
+display_name = "Panic"
+stat = &"panic"
+thresholds = Array[float]([25.0, 50.0, 75.0, 90.0])
+labels = Array[String](["Uneasy", "Panicked", "Terrified", "Hysterical"])
+color = Color(0.95, 0.75, 0.2, 1.0)
+hint = "Fine tasks are impossible. Your breathing carries."

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"stale_sandwich"
+display_name = "Abandoned Sandwich"
+description = "Found where somebody left it, some time ago. How hungry are you?"
+weight_kg = 0.2
+world_shape = "box"
+world_color = Color(0.7, 0.65, 0.5, 1.0)
+world_size = Vector3(0.12, 0.05, 0.12)
+categories = Array[StringName]([&"food"])
+use_behavior = "consume"
+hunger_restore = 30.0
+sickness_risk = 0.35

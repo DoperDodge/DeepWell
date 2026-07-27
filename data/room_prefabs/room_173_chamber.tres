@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="RoomDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/facility/room_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"room_173_chamber"
+display_name = "Containment Chamber 173"
+size_w = 3
+size_h = 3
+style = "containment_cell"
+special = "scp_173_chamber"
+weight = 1.0
+max_instances = 1
+door_clearance = 0
+powered_down_chance = 0.0
+containers_min = 0
+containers_max = 2
+loot_table = &"generic"
+documents_min = 0
+documents_max = 1
+light_color = Color(0.95, 0.85, 0.7, 1.0)
+broken_light_chance = 0.7
+corpse_chance = 0.0

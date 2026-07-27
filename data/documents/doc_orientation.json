@@ -1,0 +1,26 @@
+{
+ "id": "doc_orientation",
+ "title": "Welcome to Site-104 (D-Class Orientation Pamphlet)",
+ "doc_type": "pamphlet",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "WELCOME TO SITE-104.\n\nYou have been selected for participation in essential Foundation research. Your cooperation period is one (1) calendar month, after which "
+  },
+  {
+   "clearance": 2,
+   "text": "no release will occur. Amnestic termination or reassignment are the only exit pathways for D-Class personnel",
+   "redacted_as": "you will be released with compensation and a full legal pardon"
+  },
+  {
+   "clearance": 0,
+   "text": ".\n\nRULES:\n1. Obey all instructions from Foundation staff.\n2. Remain in designated areas.\n3. Do not interact with anomalous objects unless instructed.\n4. Report unusual thoughts, dreams, or compulsions to your assigned researcher.\n\nYour biomonitor implant tracks your vital signs at all times. It is for your safety.\n\n"
+  },
+  {
+   "clearance": 3,
+   "text": "NOTE (Ethics Committee liaison): the implant does not include a locator. If a subject leaves visual coverage during a containment event, the Foundation's official position is that the subject has already been terminated.",
+   "redacted_as": ""
+  }
+ ]
+}

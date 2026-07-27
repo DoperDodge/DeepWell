@@ -1,0 +1,17 @@
+{
+ "id": "doc_amnestics",
+ "title": "Amnestics: A Field Guide (Staff Pamphlet)",
+ "doc_type": "pamphlet",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "SO YOU'VE SEEN SOMETHING YOU SHOULDN'T HAVE\n\nClass-A amnestics remove the last few hours. Class-B, the last few days. Both remove anomalous cognitive contamination \u2014 the headaches, the pattern behind your eyelids, the door you keep almost remembering.\n\nSide effects: disorientation, loss of learned routes, and the strong sense of having forgotten something important. This is normal. It is usually even true.\n\n"
+  },
+  {
+   "clearance": 2,
+   "text": "Dosage note: amnestics do NOT remove the Sculpture's location from your mind, because the Sculpture's location was never in your mind. You know where it is because it wants you to. This is under study.",
+   "redacted_as": "[REDACTED]"
+  }
+ ]
+}

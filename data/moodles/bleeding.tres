@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoodleDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/survival/moodle_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bleeding"
+display_name = "Bleeding"
+stat = &"bleeding"
+thresholds = Array[float]([5.0, 30.0, 60.0, 85.0])
+labels = Array[String](["Bleeding", "Bleeding Badly", "Hemorrhaging", "Bleeding Out"])
+color = Color(0.85, 0.15, 0.15, 1.0)
+hint = "You are leaving a trail. Things follow trails."

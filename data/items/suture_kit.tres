@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"suture_kit"
+display_name = "Suture Kit"
+description = "Curved needle, thread, clamp. Deep wounds do not close themselves."
+weight_kg = 0.2
+max_stack = 2
+world_shape = "box"
+world_color = Color(0.4, 0.6, 0.55, 1.0)
+world_size = Vector3(0.14, 0.04, 0.09)
+categories = Array[StringName]([&"medical"])
+use_behavior = "medical"
+behavior_params = {"medical_kind": "suture", "power": 1.0}

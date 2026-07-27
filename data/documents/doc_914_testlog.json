@@ -1,0 +1,26 @@
+{
+ "id": "doc_914_testlog",
+ "title": "Test Log 914-D \u2014 Selected Entries",
+ "doc_type": "test_log",
+ "found_on_floor": 3,
+ "body": [
+  {
+   "clearance": 0,
+   "text": "TEST LOG 914-D \u2014 D-CLASS EXPENDITURE RECORD\n\nTest 44: Input: one (1) pocket watch, damaged. Setting: 1:1. Output: one (1) pocket watch, functional, wrong time. The time it shows is always 03:47.\n\nTest 51: Input: one (1) 9V battery. Setting: VERY FINE. Output: "
+  },
+  {
+   "clearance": 2,
+   "text": "one (1) object, battery-shaped, mass 0.4 kg over input. Powers devices indefinitely. Devices so powered report a second set of readings from an adjacent room that does not exist.",
+   "redacted_as": "[DATA EXPUNGED]"
+  },
+  {
+   "clearance": 0,
+   "text": "\n\nTest 58: Input: "
+  },
+  {
+   "clearance": 3,
+   "text": "one (1) D-Class subject (D-8804), against protocol, on the Director's verbal order. Setting: FINE. Output: [REMAINDER OF ENTRY SEALED BY O5 DIRECTIVE]",
+   "redacted_as": "[ENTRY SEALED]"
+  }
+ ]
+}

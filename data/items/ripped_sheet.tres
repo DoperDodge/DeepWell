@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/items/item_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ripped_sheet"
+display_name = "Ripped Sheet"
+description = "A strip of bedding. Stops light bleeding, badly. Boil it or regret it."
+weight_kg = 0.08
+max_stack = 6
+world_shape = "paper"
+world_color = Color(0.8, 0.78, 0.72, 1.0)
+categories = Array[StringName]([&"medical", &"material"])
+use_behavior = "medical"
+behavior_params = {"medical_kind": "bandage", "power": 0.5}
+upgrade_result = &"bandage"
